@@ -1,60 +1,49 @@
-package com.secretariaculturacarabobo.cultistregistration.backend.entities;
+package com.secretariaculturacarabobo.cultistregistration.backend.dtos;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+public class CultistResponse {
 
-@Entity
-@Table(name = "cultists")
-public class Cultist {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(length = 50, nullable = false)
     private String firstName;
-    @Column(length = 50, nullable = false)
     private String lastName;
-    @Column(length = 10, nullable = false, unique = true)
     private String idNumber;
-    @Column(nullable = false)
     private LocalDate birthDate;
-    @Column(length = 12, nullable = false, unique = true)
     private String phoneNumber;
-    @Column(length = 150, nullable = false, unique = true)
     private String email;
-    @Column(length = 30, nullable = true, unique = true)
     private String instagramUser;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "municipality_id", nullable = false)
-    private Municipality municipality;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parish_id", nullable = false)
-    private Parish parish;
-    @Column(length = 100, nullable = false)
+    private int municipalityId;
+    private int parishId;
     private String homeAddress;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "art_category_id", nullable = false)
-    private ArtCategory artCategory;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "art_discipline_id", nullable = false)
-    private ArtDiscipline artDiscipline;
-    @Column(nullable = false)
+    private int artCategoryId;
+    private int artDisciplineId;
     private int yearsOfExperience;
-    @Column(length = 100, nullable = true)
     private String groupName;
-    @Column(length = 100, nullable = true)
     private String disability;
-    @Column(length = 100, nullable = true)
     private String illness;
+
+    public CultistResponse(int id, String firstName, String lastName, String idNumber, LocalDate birthDate,
+            String phoneNumber,
+            String email, String instagramUser, int municipalityId, int parishId, String homeAddress, int artCategoryId,
+            int artDisciplineId, int yearsOfExperience, String groupName, String disability, String illness) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.idNumber = idNumber;
+        this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.instagramUser = instagramUser;
+        this.municipalityId = municipalityId;
+        this.parishId = parishId;
+        this.homeAddress = homeAddress;
+        this.artCategoryId = artCategoryId;
+        this.artDisciplineId = artDisciplineId;
+        this.yearsOfExperience = yearsOfExperience;
+        this.groupName = groupName;
+        this.disability = disability;
+        this.illness = illness;
+    }
 
     public int getId() {
         return id;
@@ -120,20 +109,20 @@ public class Cultist {
         this.instagramUser = instagramUser;
     }
 
-    public Municipality getMunicipality() {
-        return municipality;
+    public int getMunicipalityId() {
+        return municipalityId;
     }
 
-    public void setMunicipality(Municipality municipality) {
-        this.municipality = municipality;
+    public void setMunicipalityId(int municipalityId) {
+        this.municipalityId = municipalityId;
     }
 
-    public Parish getParish() {
-        return parish;
+    public int getParishId() {
+        return parishId;
     }
 
-    public void setParish(Parish parish) {
-        this.parish = parish;
+    public void setParishId(int parishId) {
+        this.parishId = parishId;
     }
 
     public String getHomeAddress() {
@@ -144,20 +133,20 @@ public class Cultist {
         this.homeAddress = homeAddress;
     }
 
-    public ArtCategory getArtCategory() {
-        return artCategory;
+    public int getArtCategoryId() {
+        return artCategoryId;
     }
 
-    public void setArtCategory(ArtCategory artCategory) {
-        this.artCategory = artCategory;
+    public void setArtCategoryId(int artCategoryId) {
+        this.artCategoryId = artCategoryId;
     }
 
-    public ArtDiscipline getArtDiscipline() {
-        return artDiscipline;
+    public int getArtDisciplineId() {
+        return artDisciplineId;
     }
 
-    public void setArtDiscipline(ArtDiscipline artDiscipline) {
-        this.artDiscipline = artDiscipline;
+    public void setArtDisciplineId(int artDisciplineId) {
+        this.artDisciplineId = artDisciplineId;
     }
 
     public int getYearsOfExperience() {

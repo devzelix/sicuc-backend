@@ -7,8 +7,6 @@ import jakarta.persistence.GenerationType;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "municipalities")
@@ -17,9 +15,7 @@ public class Municipality {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @NotNull
-    @Size(max = 100)
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     public int getId() {

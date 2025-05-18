@@ -6,4 +6,12 @@ import com.secretariaculturacarabobo.cultistregistration.backend.entities.Cultis
 
 public interface CultistRepository extends JpaRepository<Cultist, Integer> {
 
+    boolean existsByIdNumber(String idNumber);
+
+    boolean existsByPhoneNumber(String phoneNumber);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByInstagramUser(String instragramUser);
+
 }
