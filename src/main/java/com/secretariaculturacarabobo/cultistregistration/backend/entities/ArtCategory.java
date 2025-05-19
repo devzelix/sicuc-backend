@@ -18,6 +18,13 @@ public class ArtCategory {
     @Column(length = 100, nullable = false, unique = true)
     private String name;
 
+    public ArtCategory() {
+    }
+
+    public ArtCategory(String name) {
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }

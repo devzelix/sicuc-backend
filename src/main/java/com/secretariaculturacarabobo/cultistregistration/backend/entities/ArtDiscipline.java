@@ -25,6 +25,14 @@ public class ArtDiscipline {
     @JoinColumn(name = "art_category_id", nullable = false)
     private ArtCategory artCategory;
 
+    public ArtDiscipline() {
+    }
+
+    public ArtDiscipline(String name, ArtCategory artCategory) {
+        this.name = name;
+        this.artCategory = artCategory;
+    }
+
     public int getId() {
         return id;
     }
