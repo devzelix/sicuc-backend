@@ -56,6 +56,31 @@ public class Cultist {
     @Column(length = 100, nullable = true)
     private String illness;
 
+    public Cultist() {
+    }
+
+    public Cultist(String firstName, String lastName, String idNumber, LocalDate birthDate, String phoneNumber,
+            String email, Municipality municipality, Parish parish, String homeAddress, ArtCategory artCategory,
+            ArtDiscipline artDiscipline, int yearsOfExperience, String groupName, String disability, String illness) {
+
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.idNumber = idNumber;
+        this.birthDate = birthDate;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.municipality = municipality;
+        this.parish = parish;
+        this.homeAddress = homeAddress;
+        this.artCategory = artCategory;
+        this.artDiscipline = artDiscipline;
+        this.yearsOfExperience = yearsOfExperience;
+        this.groupName = groupName;
+        this.disability = disability;
+        this.illness = illness;
+
+    }
+
     public int getId() {
         return id;
     }

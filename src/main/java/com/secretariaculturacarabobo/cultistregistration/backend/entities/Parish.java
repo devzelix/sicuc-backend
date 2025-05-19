@@ -25,6 +25,14 @@ public class Parish {
     @JoinColumn(name = "municipality_id", nullable = false)
     private Municipality municipality;
 
+    public Parish() {
+    }
+
+    public Parish(String name, Municipality municipality) {
+        this.name = name;
+        this.municipality = municipality;
+    }
+
     public int getId() {
         return id;
     }

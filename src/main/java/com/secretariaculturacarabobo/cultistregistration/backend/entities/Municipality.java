@@ -18,6 +18,13 @@ public class Municipality {
     @Column(length = 100, nullable = false, unique = true)
     private String name;
 
+    public Municipality() {
+    }
+
+    public Municipality(String name) {
+        this.name = name;
+    }
+
     public int getId() {
         return id;
     }
