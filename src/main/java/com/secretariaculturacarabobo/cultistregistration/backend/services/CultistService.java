@@ -13,6 +13,7 @@ import com.secretariaculturacarabobo.cultistregistration.backend.repositories.Ar
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.CultistRepository;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.MunicipalityRepository;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.ParishRepository;
+import com.secretariaculturacarabobo.cultistregistration.backend.specifications.CultistSpecification;
 import com.secretariaculturacarabobo.cultistregistration.backend.utils.DateValidator;
 import com.secretariaculturacarabobo.cultistregistration.backend.utils.StringUtils;
 import com.secretariaculturacarabobo.cultistregistration.backend.utils.StringValidator;
@@ -20,7 +21,10 @@ import com.secretariaculturacarabobo.cultistregistration.backend.utils.StringVal
 import jakarta.persistence.EntityNotFoundException;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -50,11 +54,29 @@ public class CultistService {
                         throw new DuplicateEntityException("Phone Number Already Exists");
                 if (cultistRepository.existsByEmail(cultistRequest.getEmail()))
                         throw new DuplicateEntityException("Email Already Exists");
-                if (cultistRepository.existsByInstagramUser(cultistRequest.getInstagramUser()))
-                        throw new DuplicateEntityException("Instagram Username Already Exists");
+                String instagramUser = cultistRequest.getInstagramUser();
+                if (instagramUser != null && !instagramUser.trim().isEmpty()) {
+                        instagramUser = instagramUser.toLowerCase();
+                        if (cultistRepository.existsByInstagramUser(cultistRequest.getInstagramUser()))
+                                throw new DuplicateEntityException("Instagram Username Already Exists");
+                }
                 Cultist cultist = toCultist(cultistRequest);
                 Cultist saved = cultistRepository.save(cultist);
                 return ResponseEntity.ok(toCultistResponse(saved));
+        }
+
+        public List<CultistResponse> getAllCultistsWithFilters(String query, String gender, Integer municipalityId,
+                        Integer parishId,
+                        Integer artCategoryId, Integer artDisciplineId,
+                        Boolean hasDisability, Boolean hasIllness) {
+                Specification<Cultist> specification = CultistSpecification.withFilters(query,
+                                gender, municipalityId, parishId, artCategoryId, artDisciplineId, hasDisability,
+                                hasIllness);
+
+                return cultistRepository.findAll(specification)
+                                .stream()
+                                .map(this::toCultistResponse)
+                                .collect(Collectors.toList());
         }
 
         private Cultist toCultist(CultistRequest cultistRequest) {
@@ -66,15 +88,21 @@ public class CultistService {
                 if (!StringValidator.isValidName(lastName))
                         throw new IllegalArgumentException("LastName Is Invalid");
                 lastName = StringUtils.toCapitalize(lastName);
-                String idNumber = cultistRequest.getIdNumber();
+                String gender = cultistRequest.getGender().trim().toUpperCase();
+                if (!gender.equals("F") && !gender.equals("M"))
+                        throw new IllegalArgumentException("Gender Is Invalid");
+                String idNumber = cultistRequest.getIdNumber().trim();
                 LocalDate birthDate = cultistRequest.getBirthDate();
                 if (!DateValidator.isValidBirthDate(birthDate))
                         throw new IllegalArgumentException("BirthDate Is Invalid");
-                String phoneNumber = cultistRequest.getPhoneNumber();
-                String email = cultistRequest.getEmail();
-                email = email.toLowerCase();
+                String phoneNumber = cultistRequest.getPhoneNumber().trim();
+                String email = cultistRequest.getEmail().trim().toLowerCase();
                 String instagramUser = cultistRequest.getInstagramUser();
-                instagramUser = instagramUser.toLowerCase();
+                if (instagramUser == null || instagramUser.isBlank()) {
+                        instagramUser = null;
+                } else {
+                        instagramUser = instagramUser.trim().toLowerCase();
+                }
                 Municipality municipality = municipalityRepository.findById(cultistRequest.getMunicipalityId())
                                 .orElseThrow(() -> new EntityNotFoundException("Municipality Not Found"));
                 Parish parish = parishRepository.findById(cultistRequest.getParishId())
@@ -89,15 +117,28 @@ public class CultistService {
                 validateArtDisciplineId(artDiscipline, cultistRequest);
                 int yearsofExperience = cultistRequest.getYearsOfExperience();
                 String groupName = cultistRequest.getGroupName();
-                groupName = StringUtils.toCapitalize(groupName);
+                if (groupName == null || groupName.isBlank()) {
+                        groupName = null;
+                } else {
+                        groupName = StringUtils.toCapitalize(groupName);
+                }
                 String disability = cultistRequest.getDisability();
-                disability = disability.toLowerCase();
+                if (disability == null || disability.isBlank()) {
+                        disability = null;
+                } else {
+                        disability = disability.trim().toLowerCase();
+                }
                 String illness = cultistRequest.getIllness();
-                illness = illness.toLowerCase();
+                if (illness == null || illness.isBlank()) {
+                        illness = null;
+                } else {
+                        illness = illness.trim().toLowerCase();
+                }
 
                 Cultist cultist = new Cultist();
                 cultist.setFirstName(firstName);
                 cultist.setLastName(lastName);
+                cultist.setGender(gender);
                 cultist.setIdNumber(idNumber);
                 cultist.setBirthDate(birthDate);
                 cultist.setPhoneNumber(phoneNumber);
@@ -120,6 +161,7 @@ public class CultistService {
                 int id = cultist.getId();
                 String firstName = cultist.getFirstName();
                 String lastName = cultist.getLastName();
+                String gender = cultist.getGender();
                 String idNumber = cultist.getIdNumber();
                 LocalDate birthDate = cultist.getBirthDate();
                 String phoneNumber = cultist.getPhoneNumber();
@@ -135,7 +177,8 @@ public class CultistService {
                 String disability = cultist.getDisability();
                 String illness = cultist.getIllness();
 
-                CultistResponse cultistResponse = new CultistResponse(id, firstName, lastName, idNumber, birthDate,
+                CultistResponse cultistResponse = new CultistResponse(id, firstName, lastName, gender, idNumber,
+                                birthDate,
                                 phoneNumber,
                                 email,
                                 instagramUser, municipalityId, parishId, homeAddress, artCategoryId, artDisciplineId,

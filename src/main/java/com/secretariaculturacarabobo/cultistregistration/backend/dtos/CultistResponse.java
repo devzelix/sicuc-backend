@@ -7,6 +7,7 @@ public class CultistResponse {
     private int id;
     private String firstName;
     private String lastName;
+    private String gender;
     private String idNumber;
     private LocalDate birthDate;
     private String phoneNumber;
@@ -22,13 +23,15 @@ public class CultistResponse {
     private String disability;
     private String illness;
 
-    public CultistResponse(int id, String firstName, String lastName, String idNumber, LocalDate birthDate,
+    public CultistResponse(int id, String firstName, String lastName, String gender, String idNumber,
+            LocalDate birthDate,
             String phoneNumber,
             String email, String instagramUser, int municipalityId, int parishId, String homeAddress, int artCategoryId,
             int artDisciplineId, int yearsOfExperience, String groupName, String disability, String illness) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
         this.idNumber = idNumber;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
@@ -67,6 +70,14 @@ public class CultistResponse {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getIdNumber() {

@@ -23,6 +23,8 @@ public class Cultist {
     private String firstName;
     @Column(length = 50, nullable = false)
     private String lastName;
+    @Column(length = 1, nullable = false)
+    private String gender;
     @Column(length = 10, nullable = false, unique = true)
     private String idNumber;
     @Column(nullable = false)
@@ -59,12 +61,14 @@ public class Cultist {
     public Cultist() {
     }
 
-    public Cultist(String firstName, String lastName, String idNumber, LocalDate birthDate, String phoneNumber,
+    public Cultist(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
+            String phoneNumber,
             String email, Municipality municipality, Parish parish, String homeAddress, ArtCategory artCategory,
             ArtDiscipline artDiscipline, int yearsOfExperience, String groupName, String disability, String illness) {
 
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
         this.idNumber = idNumber;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
@@ -103,6 +107,14 @@ public class Cultist {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getIdNumber() {

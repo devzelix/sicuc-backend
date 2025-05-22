@@ -11,35 +11,37 @@ import jakarta.validation.constraints.Size;
 
 public class CultistRequest {
 
-    @NotBlank(message = "Is Requerid")
+    @NotBlank(message = "Is Required")
     @Size(max = 50, message = "Must Have A Maximum Of 50 Characters")
     private String firstName;
-    @NotBlank(message = "Is Requerid")
+    @NotBlank(message = "Is Required")
     @Size(max = 50, message = "Must Have A Maximum Of 50 Characters")
     private String lastName;
-    @NotBlank(message = "Is Requerid")
+    @NotBlank(message = "Is Required")
+    @Size(max = 1)
+    private String gender;
+    @NotBlank(message = "Is Required")
     @Size(max = 10, message = "Must Have A Maximum Of 10 Characters")
     @Pattern(regexp = "^[VE]-\\d{1,8}$", message = "Is Invalid")
     private String idNumber;
-    @NotNull(message = "Is Requerid")
+    @NotNull(message = "Is Required")
     private LocalDate birthDate;
-    @NotBlank(message = "Is Requerid")
+    @NotBlank(message = "Is Required")
     @Size(min = 12, max = 12, message = "Must Be 12 Characters")
     @Pattern(regexp = "^04(12|14|16|24|26)-\\d{7}$", message = "Is Invalid")
     private String phoneNumber;
-    @NotBlank(message = "Is Requerid")
+    @NotBlank(message = "Is Required")
     @Size(max = 150, message = "Must Have A Maximum Of 150 Characters")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,184}\\.[a-zA-Z]{2,10}$", message = "Is Invalid")
     private String email;
-    @NotBlank(message = "Is Requerid")
     @Size(max = 30, message = "Must Have A Maximum Of 30 Characters")
-    @Pattern(regexp = "^(?!.*[._]{2})[a-zA-Z0-9](?:[a-zA-Z0-9._]{0,28}[a-zA-Z0-9])?$", message = "Is Invalid")
+    @Pattern(regexp = "^$|^(?!.*[._]{2})[a-zA-Z0-9](?:[a-zA-Z0-9._]{0,28}[a-zA-Z0-9])?$", message = "Is Invalid")
     private String instagramUser;
     @Min(1)
     private int municipalityId;
     @Min(1)
     private int parishId;
-    @NotBlank(message = "Is Requerid")
+    @NotBlank(message = "Is Required")
     @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
     @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{1,100}$", message = "Is Invalid")
     private String homeAddress;
@@ -51,20 +53,22 @@ public class CultistRequest {
     @Max(100)
     private int yearsOfExperience;
     @Size(max = 100)
-    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
+    @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
     private String groupName;
     @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
-    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
+    @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
     private String disability;
     @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
-    @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
+    @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
     private String illness;
 
-    public CultistRequest(String firstName, String lastName, String idNumber, LocalDate birthDate, String phoneNumber,
+    public CultistRequest(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
+            String phoneNumber,
             String email, String instagramUser, int municipalityId, int parishId, String homeAddress, int artCategoryId,
             int artDisciplineId, int yearsOfExperience, String groupName, String disability, String illness) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.gender = gender;
         this.idNumber = idNumber;
         this.birthDate = birthDate;
         this.phoneNumber = phoneNumber;
@@ -95,6 +99,14 @@ public class CultistRequest {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getIdNumber() {
