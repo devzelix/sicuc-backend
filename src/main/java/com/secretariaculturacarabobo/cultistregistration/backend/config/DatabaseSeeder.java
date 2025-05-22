@@ -3,6 +3,7 @@ package com.secretariaculturacarabobo.cultistregistration.backend.config;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.ArtCategory;
@@ -15,6 +16,7 @@ import com.secretariaculturacarabobo.cultistregistration.backend.repositories.Mu
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.ParishRepository;
 
 @Component
+@Profile("dev")
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final MunicipalityRepository municipalityRepository;
