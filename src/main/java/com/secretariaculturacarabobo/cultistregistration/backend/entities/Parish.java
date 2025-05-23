@@ -11,27 +11,41 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-@Entity
+@Entity // Marks this class as a JPA entity
 @Table(name = "parishes", uniqueConstraints = {
-        @jakarta.persistence.UniqueConstraint(columnNames = { "name", "municipality_id" }) })
+        @jakarta.persistence.UniqueConstraint(columnNames = { "name", "municipality_id" })
+}) // Ensures that each parish name is unique within a municipality
 public class Parish {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremented primary key
     private int id;
-    @Column(length = 100, nullable = false)
+
+    @Column(length = 100, nullable = false) // Name column with max length and not null constraint
     private String name;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "municipality_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many parishes can belong to one municipality; lazy loading for performance
+    @JoinColumn(name = "municipality_id", nullable = false) // Foreign key column, not nullable
     private Municipality municipality;
 
+    /**
+     * Default constructor required by JPA.
+     */
     public Parish() {
     }
 
+    /**
+     * Convenience constructor to create a Parish with a name and municipality.
+     *
+     * @param name         the parish name
+     * @param municipality the associated municipality
+     */
     public Parish(String name, Municipality municipality) {
         this.name = name;
         this.municipality = municipality;
     }
+
+    // Getters and setters
 
     public int getId() {
         return id;

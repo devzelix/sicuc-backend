@@ -10,6 +10,9 @@ import com.secretariaculturacarabobo.cultistregistration.backend.dtos.ArtDiscipl
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.ArtDiscipline;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.ArtDisciplineRepository;
 
+/**
+ * Service class responsible for operations related to Art Disciplines.
+ */
 @Service
 public class ArtDisciplineService {
 
@@ -19,14 +22,25 @@ public class ArtDisciplineService {
         this.artDisciplineRepository = artDisciplineRepository;
     }
 
+    /**
+     * Retrieves all art disciplines sorted by ID and maps them to DTOs.
+     *
+     * @return a list of ArtDisciplineResponse DTOs
+     */
     public List<ArtDisciplineResponse> getAll() {
         return artDisciplineRepository.findAll(Sort.by("id")).stream().map(this::toArtDisciplineResponse)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Converts an ArtDiscipline entity to its DTO representation.
+     *
+     * @param artDiscipline the ArtDiscipline entity
+     * @return the corresponding ArtDisciplineResponse DTO
+     */
     public ArtDisciplineResponse toArtDisciplineResponse(ArtDiscipline artDiscipline) {
         return new ArtDisciplineResponse(artDiscipline.getId(), artDiscipline.getName(),
-                artDiscipline.getaArtCategory().getId());
+                artDiscipline.getArtCategory().getId());
     }
 
 }

@@ -2,27 +2,66 @@ package com.secretariaculturacarabobo.cultistregistration.backend.dtos;
 
 import java.time.LocalDate;
 
+/**
+ * DTO for sending cultist data back to the client.
+ */
 public class CultistResponse {
 
+    // Unique database ID
     private int id;
+
+    // First name
     private String firstName;
+
+    // Last name
     private String lastName;
+
+    // Gender
     private String gender;
+
+    // National ID number (e.g., V-12345678)
     private String idNumber;
+
+    // Date of birth
     private LocalDate birthDate;
+
+    // Phone number (e.g., 0412-1234567)
     private String phoneNumber;
+
+    // Email address
     private String email;
+
+    // Instagram username (optional)
     private String instagramUser;
+
+    // Municipality ID
     private int municipalityId;
+
+    // Parish ID
     private int parishId;
+
+    // Full home address
     private String homeAddress;
+
+    // Art category ID
     private int artCategoryId;
+
+    // Art discipline ID
     private int artDisciplineId;
+
+    // Total years of experience in the field
     private int yearsOfExperience;
+
+    // Artistic group name (optional)
     private String groupName;
+
+    // Disability description (optional)
     private String disability;
+
+    // Illness description (optional)
     private String illness;
 
+    // Constructor with all fields
     public CultistResponse(int id, String firstName, String lastName, String gender, String idNumber,
             LocalDate birthDate,
             String phoneNumber,
@@ -47,6 +86,8 @@ public class CultistResponse {
         this.disability = disability;
         this.illness = illness;
     }
+
+    // Getters and setters
 
     public int getId() {
         return id;

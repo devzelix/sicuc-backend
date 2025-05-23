@@ -9,59 +9,63 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
+/**
+ * DTO for incoming Cultist registration requests.
+ */
 public class CultistRequest {
 
     @NotBlank(message = "Is Required")
     @Size(max = 50, message = "Must Have A Maximum Of 50 Characters")
-    private String firstName;
+    private String firstName; // Cultist's first name
     @NotBlank(message = "Is Required")
     @Size(max = 50, message = "Must Have A Maximum Of 50 Characters")
-    private String lastName;
+    private String lastName; // Cultist's last name
     @NotBlank(message = "Is Required")
     @Size(max = 1)
-    private String gender;
+    private String gender; // Gender (single character)
     @NotBlank(message = "Is Required")
     @Size(max = 10, message = "Must Have A Maximum Of 10 Characters")
     @Pattern(regexp = "^[VE]-\\d{1,8}$", message = "Is Invalid")
-    private String idNumber;
+    private String idNumber; // Identification number, format e.g. V-12345678
     @NotNull(message = "Is Required")
     private LocalDate birthDate;
     @NotBlank(message = "Is Required")
     @Size(min = 12, max = 12, message = "Must Be 12 Characters")
     @Pattern(regexp = "^04(12|14|16|24|26)-\\d{7}$", message = "Is Invalid")
-    private String phoneNumber;
+    private String phoneNumber; // Phone number, format e.g. 0412-1234567
     @NotBlank(message = "Is Required")
     @Size(max = 150, message = "Must Have A Maximum Of 150 Characters")
     @Pattern(regexp = "^[a-zA-Z0-9._%+-]{1,64}@[a-zA-Z0-9.-]{1,184}\\.[a-zA-Z]{2,10}$", message = "Is Invalid")
-    private String email;
+    private String email; // Email address
     @Size(max = 30, message = "Must Have A Maximum Of 30 Characters")
     @Pattern(regexp = "^$|^(?!.*[._]{2})[a-zA-Z0-9](?:[a-zA-Z0-9._]{0,28}[a-zA-Z0-9])?$", message = "Is Invalid")
-    private String instagramUser;
+    private String instagramUser; // Optional Instagram username
     @Min(1)
-    private int municipalityId;
+    private int municipalityId; // Associated municipality ID
     @Min(1)
-    private int parishId;
+    private int parishId; // Associated parish ID
     @NotBlank(message = "Is Required")
     @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
     @Pattern(regexp = "^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{1,100}$", message = "Is Invalid")
-    private String homeAddress;
+    private String homeAddress; // Home address
     @Min(1)
-    private int artCategoryId;
+    private int artCategoryId; // Associated art category ID
     @Min(1)
-    private int artDisciplineId;
+    private int artDisciplineId; // Associated art discipline ID
     @Min(1)
     @Max(100)
-    private int yearsOfExperience;
+    private int yearsOfExperience; // Years of experience (1-100)
     @Size(max = 100)
     @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
-    private String groupName;
+    private String groupName; // Optional artistic group name
     @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
     @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
-    private String disability;
+    private String disability; // Optional disability description
     @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
     @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
-    private String illness;
+    private String illness; // Optional illness description
 
+    // Constructor with all fields
     public CultistRequest(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
             String phoneNumber,
             String email, String instagramUser, int municipalityId, int parishId, String homeAddress, int artCategoryId,
@@ -84,6 +88,8 @@ public class CultistRequest {
         this.disability = disability;
         this.illness = illness;
     }
+
+    // Getters and setters
 
     public String getFirstName() {
         return firstName;

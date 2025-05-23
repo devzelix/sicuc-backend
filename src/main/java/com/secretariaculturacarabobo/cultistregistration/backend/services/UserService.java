@@ -1,20 +1,20 @@
 package com.secretariaculturacarabobo.cultistregistration.backend.services;
 
-import com.secretariaculturacarabobo.cultistregistration.backend.dtos.UserRequest;
-import com.secretariaculturacarabobo.cultistregistration.backend.dtos.UserResponse;
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.User;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.UserRepository;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class responsible for loading user-specific data for authentication.
+ * Implements UserDetailsService from Spring Security to integrate with the
+ * security framework.
+ */
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -24,24 +24,24 @@ public class UserService {
 
     }
 
-    public ResponseEntity<?> authenticate(UserRequest userRequest) {
-        User user = userRepository.findByUsername(userRequest.getUsername());
-        if (user != null) {
-            if (BCrypt.checkpw(userRequest.getPassword(), user.getPassword()))
-                return ResponseEntity.ok(toUserResponse(user));
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "Username Or Password Incorrect");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        } else {
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "Username Or Password Incorrect");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    /**
+     * Loads a user by their username.
+     * Used by Spring Security during the authentication process.
+     * 
+     * @param username the username identifying the user whose data is required.
+     * @return UserDetails object containing user information.
+     * @throws UsernameNotFoundException if the user is not found in the repository.
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            // Throw exception if user not found to trigger authentication failure
+            throw new UsernameNotFoundException("User not found with username: " + username);
         }
-    }
 
-    public UserResponse toUserResponse(User user) {
-        UserResponse userResponse = new UserResponse(user.getId(), user.getUsername());
-        return userResponse;
+        // Return the User entity which implements UserDetails
+        return user;
     }
 
 }

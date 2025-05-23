@@ -12,60 +12,82 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "cultists")
+@Entity // Specifies that this class is a JPA entity
+@Table(name = "cultists") // Maps to the "cultists" table in the database
 public class Cultist {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generated primary key
     private int id;
-    @Column(length = 50, nullable = false)
+
+    @Column(length = 50, nullable = false) // First name, required, max length 50
     private String firstName;
-    @Column(length = 50, nullable = false)
+
+    @Column(length = 50, nullable = false) // Last name, required, max length 50
     private String lastName;
-    @Column(length = 1, nullable = false)
+
+    @Column(length = 1, nullable = false) // Gender (e.g., M/F/O), required, 1 character
     private String gender;
-    @Column(length = 10, nullable = false, unique = true)
+
+    @Column(length = 10, nullable = false, unique = true) // National ID number, required and unique
     private String idNumber;
-    @Column(nullable = false)
+
+    @Column(nullable = false) // Birth date, required
     private LocalDate birthDate;
-    @Column(length = 12, nullable = false, unique = true)
+
+    @Column(length = 12, nullable = false, unique = true) // Phone number, required and unique
     private String phoneNumber;
-    @Column(length = 150, nullable = false, unique = true)
+
+    @Column(length = 150, nullable = false, unique = true) // Email, required and unique
     private String email;
-    @Column(length = 30, nullable = true, unique = true)
+
+    @Column(length = 30, unique = true) // Optional Instagram username, unique if provided
     private String instagramUser;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "municipality_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many cultists belong to one municipality
+    @JoinColumn(name = "municipality_id", nullable = false) // Foreign key to Municipality
     private Municipality municipality;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parish_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many cultists belong to one parish
+    @JoinColumn(name = "parish_id", nullable = false) // Foreign key to Parish
     private Parish parish;
-    @Column(length = 100, nullable = false)
+
+    @Column(length = 100, nullable = false) // Full home address, required
     private String homeAddress;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "art_category_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many cultists can belong to one art category
+    @JoinColumn(name = "art_category_id", nullable = false) // Foreign key to ArtCategory
     private ArtCategory artCategory;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "art_discipline_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY) // Many cultists can belong to one art discipline
+    @JoinColumn(name = "art_discipline_id", nullable = false) // Foreign key to ArtDiscipline
     private ArtDiscipline artDiscipline;
-    @Column(nullable = false)
+
+    @Column(nullable = false) // Required years of experience in their field
     private int yearsOfExperience;
-    @Column(length = 100, nullable = true)
+
+    @Column(length = 100) // Optional group affiliation
     private String groupName;
-    @Column(length = 100, nullable = true)
+
+    @Column(length = 100) // Optional field for recording disability
     private String disability;
-    @Column(length = 100, nullable = true)
+
+    @Column(length = 100) // Optional field for recording illness
     private String illness;
 
+    /**
+     * Default constructor for JPA.
+     */
     public Cultist() {
     }
 
+    /**
+     * All-arguments constructor to facilitate object creation.
+     */
     public Cultist(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
-            String phoneNumber,
-            String email, Municipality municipality, Parish parish, String homeAddress, ArtCategory artCategory,
-            ArtDiscipline artDiscipline, int yearsOfExperience, String groupName, String disability, String illness) {
-
+            String phoneNumber, String email, Municipality municipality, Parish parish,
+            String homeAddress, ArtCategory artCategory, ArtDiscipline artDiscipline,
+            int yearsOfExperience, String groupName, String disability, String illness) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -82,8 +104,9 @@ public class Cultist {
         this.groupName = groupName;
         this.disability = disability;
         this.illness = illness;
-
     }
+
+    // Getters and setters
 
     public int getId() {
         return id;

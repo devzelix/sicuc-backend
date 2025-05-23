@@ -4,44 +4,58 @@ import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.ArtCategory;
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.ArtDiscipline;
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.Municipality;
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.Parish;
+import com.secretariaculturacarabobo.cultistregistration.backend.entities.User;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.ArtCategoryRepository;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.ArtDisciplineRepository;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.MunicipalityRepository;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.ParishRepository;
+import com.secretariaculturacarabobo.cultistregistration.backend.repositories.UserRepository;
 
 @Component
-@Profile("dev")
+@Profile("dev") // Only run this component in the 'dev' profile
 public class DatabaseSeeder implements CommandLineRunner {
 
+    // Dependency injection for repository access
     private final MunicipalityRepository municipalityRepository;
     private final ParishRepository parishRepository;
     private final ArtCategoryRepository artCategoryRepository;
     private final ArtDisciplineRepository artDisciplineRepository;
+    private final UserRepository userRepository;
 
     public DatabaseSeeder(MunicipalityRepository municipalityRepository, ParishRepository parishRepository,
-            ArtCategoryRepository artCategoryRepository, ArtDisciplineRepository artDisciplineRepository) {
+            ArtCategoryRepository artCategoryRepository, ArtDisciplineRepository artDisciplineRepository,
+            UserRepository userRepository) {
         this.municipalityRepository = municipalityRepository;
         this.parishRepository = parishRepository;
         this.artCategoryRepository = artCategoryRepository;
         this.artDisciplineRepository = artDisciplineRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public void run(String... args) throws Exception {
 
+        // Populate database with seed data on application startup
         List<Municipality> municipalities = seedMunicipalities();
         seedParishes(municipalities);
         List<ArtCategory> artCategories = seedArtCategories();
         seedArtDisciplines(artCategories);
+        seedUsers();
 
     }
 
+    /**
+     * Seeds municipalities if the repository is empty.
+     *
+     * @return a list of inserted municipalities or null if already seeded
+     */
     private List<Municipality> seedMunicipalities() {
 
         List<Municipality> municipalities = List.of(
@@ -67,6 +81,11 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     }
 
+    /**
+     * Seeds parishes linked to the given municipalities if none exist.
+     *
+     * @param municipalities list of parent municipalities
+     */
     private void seedParishes(List<Municipality> municipalities) {
         if (municipalities != null) {
             List<Parish> parishes = List.of(
@@ -114,6 +133,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
     }
 
+    /**
+     * Seeds art categories if the repository is empty.
+     *
+     * @return a list of inserted art categories or null if already seeded
+     */
     private List<ArtCategory> seedArtCategories() {
 
         List<ArtCategory> artCategories = List.of(
@@ -132,6 +156,11 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     }
 
+    /**
+     * Seeds art disciplines linked to the given categories if none exist.
+     *
+     * @param artCategories list of parent art categories
+     */
     private void seedArtDisciplines(List<ArtCategory> artCategories) {
         if (artCategories != null) {
             List<ArtDiscipline> disciplines = List.of(
@@ -176,6 +205,18 @@ public class DatabaseSeeder implements CommandLineRunner {
             if (artDisciplineRepository.count() == 0) {
                 artDisciplineRepository.saveAll(disciplines);
             }
+        }
+    }
+
+    /**
+     * Seeds default users if the repository is empty.
+     */
+    private void seedUsers() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        List<User> users = List.of(
+                new User("admin", encoder.encode("admin")));
+        if (userRepository.count() == 0) {
+            userRepository.saveAll(users);
         }
     }
 
