@@ -61,12 +61,16 @@ public class CultistResponse {
     // Illness description (optional)
     private String illness;
 
+    // Creation date
+    private LocalDate createdAt;
+
     // Constructor with all fields
     public CultistResponse(int id, String firstName, String lastName, String gender, String idNumber,
             LocalDate birthDate,
             String phoneNumber,
             String email, String instagramUser, int municipalityId, int parishId, String homeAddress, int artCategoryId,
-            int artDisciplineId, int yearsOfExperience, String groupName, String disability, String illness) {
+            int artDisciplineId, int yearsOfExperience, String groupName, String disability, String illness,
+            LocalDate createdAt) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -85,6 +89,7 @@ public class CultistResponse {
         this.groupName = groupName;
         this.disability = disability;
         this.illness = illness;
+        this.createdAt = createdAt;
     }
 
     // Getters and setters
@@ -231,6 +236,14 @@ public class CultistResponse {
 
     public void setIllness(String illness) {
         this.illness = illness;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
     }
 
 }

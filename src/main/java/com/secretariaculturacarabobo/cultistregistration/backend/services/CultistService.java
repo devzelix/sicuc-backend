@@ -247,6 +247,7 @@ public class CultistService {
         String groupName = cultist.getGroupName();
         String disability = cultist.getDisability();
         String illness = cultist.getIllness();
+        LocalDate createdAt = cultist.getCreatedAt();
 
         CultistResponse cultistResponse = new CultistResponse(id, firstName, lastName, gender, idNumber,
                 birthDate,
@@ -255,7 +256,7 @@ public class CultistService {
                 instagramUser, municipalityId, parishId, homeAddress, artCategoryId, artDisciplineId,
                 yearsOfExperience,
                 groupName,
-                disability, illness);
+                disability, illness, createdAt);
 
         return cultistResponse;
     }
