@@ -1,5 +1,5 @@
 ## [1.1.0] - 2025-05-23
 
-### Added
+### ✨ Added
 
-- Se agregó el campo `fechaRegistro` a la entidad `Usuario`. Este campo se establece automáticamente al momento de persistir en base de datos.
+- The `createdAt` field was added to the `User` entity. This field is automatically set when persisting to the database.
