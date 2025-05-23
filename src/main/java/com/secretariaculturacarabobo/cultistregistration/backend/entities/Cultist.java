@@ -2,8 +2,12 @@ package com.secretariaculturacarabobo.cultistregistration.backend.entities;
 
 import java.time.LocalDate;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity // Specifies that this class is a JPA entity
+@EntityListeners(AuditingEntityListener.class) // Enables auditing listener for automatic timestamp management
 @Table(name = "cultists") // Maps to the "cultists" table in the database
 public class Cultist {
 
@@ -74,6 +79,10 @@ public class Cultist {
 
     @Column(length = 100) // Optional field for recording illness
     private String illness;
+
+    @CreatedDate // Automatically assigned creation date and time on entity persist
+    @Column(nullable = false, updatable = false) // Cannot be null or updated once set
+    private LocalDate createdAt;
 
     /**
      * Default constructor for JPA.
@@ -250,6 +259,14 @@ public class Cultist {
 
     public void setIllness(String illness) {
         this.illness = illness;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
     }
 
 }
