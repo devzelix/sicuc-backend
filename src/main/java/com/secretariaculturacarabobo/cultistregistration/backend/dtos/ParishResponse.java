@@ -1,16 +1,29 @@
 package com.secretariaculturacarabobo.cultistregistration.backend.dtos;
 
+/**
+ * DTO for transferring Parish data in API responses.
+ */
 public class ParishResponse {
 
+    // Unique identifier for the parish
     private int id;
+
+    // Name of the parish
     private String name;
+
+    // ID of the municipality this parish belongs to
     private int municipalityId;
 
+    /**
+     * Constructor to initialize all fields of ParishResponse.
+     */
     public ParishResponse(int id, String name, int municipalityId) {
         this.id = id;
         this.name = name;
         this.municipalityId = municipalityId;
     }
+
+    // Getters and setters
 
     public int getId() {
         return id;

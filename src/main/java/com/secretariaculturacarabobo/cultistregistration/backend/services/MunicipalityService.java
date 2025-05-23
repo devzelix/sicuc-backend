@@ -10,6 +10,9 @@ import com.secretariaculturacarabobo.cultistregistration.backend.dtos.Municipali
 import com.secretariaculturacarabobo.cultistregistration.backend.entities.Municipality;
 import com.secretariaculturacarabobo.cultistregistration.backend.repositories.MunicipalityRepository;
 
+/**
+ * Service class for managing municipality-related operations.
+ */
 @Service
 public class MunicipalityService {
 
@@ -19,12 +22,23 @@ public class MunicipalityService {
         this.municipalityRepository = municipalityRepository;
     }
 
+    /**
+     * Retrieves all municipalities sorted by ID and maps them to DTOs.
+     *
+     * @return a list of MunicipalityResponse DTOs
+     */
     public List<MunicipalityResponse> getAll() {
         return municipalityRepository.findAll(Sort.by("id")).stream()
                 .map(this::toMunicipalityResponse)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Converts a Municipality entity to its DTO representation.
+     *
+     * @param municipality the Municipality entity
+     * @return the corresponding MunicipalityResponse DTO
+     */
     public MunicipalityResponse toMunicipalityResponse(Municipality municipality) {
         return new MunicipalityResponse(municipality.getId(), municipality.getName());
     }
