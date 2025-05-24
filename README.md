@@ -1,6 +1,6 @@
 # ⚙️ Cultor Registration Backend
 
-This backend application supports the Cultist Registration system for Secretaría de Cultura Carabobo. Built with Spring Boot, it provides RESTful APIs to manage cultists and related entities such as municipalities, parishes, art categories, and art disciplines. It includes features for filtering cultists by various criteria, validating input data, and handling exceptions gracefully.
+This backend application supports the Cultors Registration system for Secretariat Of Culture Of Carabobo. Built with Spring Boot, it provides RESTful APIs to manage cultors and related entities such as municipalities, parishes, art categories, and art disciplines. It includes features for filtering cultors by various criteria, validating input data, and handling exceptions gracefully.
 
 ## Table of Contents
 
@@ -9,9 +9,10 @@ This backend application supports the Cultist Registration system for Secretarí
   - [📋 Prerequisites](#📋-prerequisites)
   - [⚙️ Setup Instructions](#⚙️-setup-instructions)
 - [▶️ How to Run the Application](#▶️-how-to-run-the-application)
-  - [🐳 Using Docker Compose](#🐳-using-docker-compose)
-  - [📦 Using Maven](#📦-using-maven)
-  - [🔧 Using Gradle](#🔧-using-gradle)
+  - [🐳 Using Docker Compose (Database Only)](#🐳-using-docker-compose-database-only)
+  - [📦 Running the Spring Boot Application](#📦-running-the-spring-boot-application)
+    - [🔧 Using Maven](#🔧-using-maven)
+    - [🔧 Using Gradle](#🔧-using-gradle)
 - [🌐 Accessing the Application](#🌐-accessing-the-application)
 - [📡 API Endpoints Overview](#📡-api-endpoints-overview)
 - [🧪 Testing the API](#🧪-testing-the-api)
@@ -58,25 +59,35 @@ This backend application supports the Cultist Registration system for Secretarí
 
 ## ▶️ How to Run the Application
 
-### 🐳 Using Docker Compose
+### 🐳 Using Docker Compose (Database Only)
 
-You can also run the entire application stack (backend + database) using Docker Compose.
+The Docker Compose setup provided only starts the database container. You need to run your Spring Boot application separately, connecting it to the running database.
 
-1. Ensure Docker and Docker Compose are installed on your machine.
+#### Steps:
 
-2. Start the application and services:
+1. Make sure Docker and Docker Compose are installed on your machine.
+
+2. Start the database container:
 
    ```bash
    docker compose up -d
    ```
 
-3. To stop the containers:
+3. Once the database is running, run your Spring Boot application separately using Maven or Gradle (see below).
+
+4. To stop the database container:
 
    ```bash
    docker compose down
    ```
 
-### 📦 Using Maven
+Alternatively, you can connect your Spring Boot application to your own existing database without using Docker Compose.
+
+### 📦 Running the Spring Boot Application
+
+You can start the Spring Boot app directly on your machine after the database is up and running.
+
+#### 🔧 Using Maven
 
 ```bash
 mvn clean install
@@ -100,21 +111,21 @@ http://localhost:8080
 
 ## 📡 API Endpoints Overview
 
-| Method | Endpoint         | Description                         |
-| ------ | ---------------- | ----------------------------------- |
-| GET    | /cultists        | List cultists with optional filters |
-| POST   | /cultists        | Register a new cultist              |
-| GET    | /municipalities  | Get all municipalities              |
-| GET    | /parishes        | Get all parishes                    |
-| GET    | /art-categories  | Get all art categories              |
-| GET    | /art-disciplines | Get all art disciplines             |
+| Method | Endpoint         | Description                        |
+| ------ | ---------------- | ---------------------------------- |
+| GET    | /cultors         | List cultors with optional filters |
+| POST   | /cultors         | Register a new cultors             |
+| GET    | /municipalities  | Get all municipalities             |
+| GET    | /parishes        | Get all parishes                   |
+| GET    | /art-categories  | Get all art categories             |
+| GET    | /art-disciplines | Get all art disciplines            |
 
 ## 🧪 Testing the API
 
 You can use tools like [Postman](https://www.postman.com/) or `curl` to test the endpoints. For example:
 
 ```bash
-curl -X GET http://localhost:8080/cultists
+curl -X GET http://localhost:8080/cultors
 ```
 
 ## 📄 License
