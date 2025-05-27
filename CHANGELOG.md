@@ -21,3 +21,10 @@
   - `Cultist` → `Cultor`
   - Field `cultistsService` in `CultorController` renamed to `cultorService`
 - Please review these changes carefully and update your code accordingly.
+
+## [2.0.1] - 2025-05-27
+
+### 🔧 Changed
+
+- Restructured `src/test/java` to match updated package structure.
+- Fixed test configuration to enable proper execution of `@SpringBootTest`.

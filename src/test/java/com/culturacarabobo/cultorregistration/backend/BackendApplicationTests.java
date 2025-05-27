@@ -1,4 +1,4 @@
-package com.secretariaculturacarabobo.cultistregistration.backend;
+package com.culturacarabobo.cultorregistration.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
