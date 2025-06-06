@@ -1,6 +1,6 @@
-# ⚙️ Cultor Registration Backend
+# ⚙️ Carabobo Cultists Information System Backend
 
-This backend application supports the Cultors Registration system for Secretariat Of Culture Of Carabobo. Built with Spring Boot, it provides RESTful APIs to manage cultors and related entities such as municipalities, parishes, art categories, and art disciplines. It includes features for filtering cultors by various criteria, validating input data, and handling exceptions gracefully.
+This backend application supports the Carabobo Cultists Information System for Secretariat Of Culture Of Carabobo. Built with Spring Boot, it provides RESTful APIs to manage cultors and related entities such as municipalities, parishes, art categories, and art disciplines. It includes features for filtering cultors by various criteria, validating input data, and handling exceptions gracefully.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ This backend application supports the Cultors Registration system for Secretaria
 ## 🚀 Technologies Used
 
 - Java 21+
-- Spring Boot 3.4.6+
+- Spring Boot 3.5.0+
 - Spring Data JPA
 - Hibernate ORM
 - Jakarta Persistence (JPA)
@@ -43,13 +43,14 @@ This backend application supports the Cultors Registration system for Secretaria
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/devzelix/cultor-registration-backend.git
+   git clone https://github.com/devzelix/SICUC-backend.git
    cd cultor-registration-backend
    ```
 
 2. Create a `.env` file in the root of the project with your environment variables:
 
    ```properties
+   API_BASE_PATH=your_base_path
    SPRING_PROFILES_ACTIVE=dev
    SPRING_JPA_HIBERNATE_DDL_AUTO=update
    SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/your_database_name
@@ -125,7 +126,7 @@ http://localhost:8080
 You can use tools like [Postman](https://www.postman.com/) or `curl` to test the endpoints. For example:
 
 ```bash
-curl -X GET http://localhost:8080/cultors
+curl -X GET http://localhost:8080/base_path/cultors
 ```
 
 ## 📄 License
