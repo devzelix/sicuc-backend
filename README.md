@@ -1,6 +1,6 @@
-# ⚙️ Carabobo Cultists Information System Backend
+# ⚙️ Carabobo Cultors Information System Backend
 
-This backend application supports the Carabobo Cultists Information System for Secretariat Of Culture Of Carabobo. Built with Spring Boot, it provides RESTful APIs to manage cultors and related entities such as municipalities, parishes, art categories, and art disciplines. It includes features for filtering cultors by various criteria, validating input data, and handling exceptions gracefully.
+This backend application supports the Carabobo Cultors Information System for Secretariat Of Culture Of Carabobo. Built with Spring Boot, it provides RESTful APIs to manage cultors and related entities such as municipalities, parishes, art categories, and art disciplines. It includes features for filtering cultors by various criteria, validating input data, and handling exceptions gracefully.
 
 ## Table of Contents
 
@@ -43,8 +43,8 @@ This backend application supports the Carabobo Cultists Information System for S
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/devzelix/SICUC-backend.git
-   cd cultor-registration-backend
+   git clone https://github.com/devzelix/sicuc-backend.git
+   cd sicuc-backend
    ```
 
 2. Create a `.env` file in the root of the project with your environment variables:
