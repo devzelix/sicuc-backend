@@ -13,7 +13,7 @@
 	
 	<groupId>com.culturacarabobo.sicuc</groupId>
 	<artifactId>backend</artifactId>
-	<version>3.1.0</version>
+	<version>4.0.0</version>
 	<name>sicuc-backend</name>
 	<description>REST service to manage carabobo cultors</description>
 

@@ -187,9 +187,16 @@ public class CultorService {
                 .orElseThrow(() -> new EntityNotFoundException("Art Category Not Found"));
         ArtDiscipline artDiscipline = artDisciplineRepository.findById(cultorRequest.getArtDisciplineId())
                 .orElseThrow(() -> new EntityNotFoundException("Art Discipline Not Found"));
-
+        String otherDiscipline = cultorRequest.getOtherDiscipline();
+        if (otherDiscipline == null || otherDiscipline.isBlank()) {
+            otherDiscipline = null;
+        } else {
+            otherDiscipline = StringUtils.toCapitalize(otherDiscipline.trim());
+        }
         // Ensure art discipline belongs to category
         validateArtDisciplineId(artDiscipline, cultorRequest);
+        validateOtherDiscipline(artDiscipline, otherDiscipline);
+
         int yearsofExperience = cultorRequest.getYearsOfExperience();
 
         // Normalize group name or set null
@@ -229,6 +236,7 @@ public class CultorService {
         cultor.setHomeAddress(homeAddress);
         cultor.setArtCategory(artCategory);
         cultor.setArtDiscipline(artDiscipline);
+        cultor.setOtherDiscipline(otherDiscipline);
         cultor.setYearsOfExperience(yearsofExperience);
         cultor.setGroupName(groupName);
         cultor.setDisability(disability);
@@ -258,6 +266,7 @@ public class CultorService {
         String homeAddress = cultor.getHomeAddress();
         int artCategoryId = cultor.getArtCategory().getId();
         int artDisciplineId = cultor.getArtDiscipline().getId();
+        String otherDiscipline = cultor.getOtherDiscipline();
         int yearsOfExperience = cultor.getYearsOfExperience();
         String groupName = cultor.getGroupName();
         String disability = cultor.getDisability();
@@ -265,13 +274,8 @@ public class CultorService {
         LocalDate createdAt = cultor.getCreatedAt();
 
         CultorResponse cultorResponse = new CultorResponse(id, firstName, lastName, gender, idNumber,
-                birthDate,
-                phoneNumber,
-                email,
-                instagramUser, municipalityId, parishId, homeAddress, artCategoryId, artDisciplineId,
-                yearsOfExperience,
-                groupName,
-                disability, illness, createdAt);
+                birthDate, phoneNumber, email, instagramUser, municipalityId, parishId, homeAddress, artCategoryId,
+                artDisciplineId, otherDiscipline, yearsOfExperience, groupName, disability, illness, createdAt);
 
         return cultorResponse;
     }
@@ -302,6 +306,15 @@ public class CultorService {
         if (artDiscipline.getArtCategory().getId() != cultorRequest.getArtCategoryId()) {
             throw new IllegalArgumentException(
                     "The Selected Discipline Does Not Belong To The Chosen Category");
+        }
+    }
+
+    private void validateOtherDiscipline(ArtDiscipline artDiscipline, String otherDiscipline) {
+        if (!artDiscipline.getName().equals("Otra...") && otherDiscipline != null && !otherDiscipline.isBlank()) {
+            throw new IllegalArgumentException("Error");
+        } else if (artDiscipline.getName().equals("Otra...")
+                && (otherDiscipline == null || otherDiscipline.isBlank())) {
+            throw new IllegalArgumentException("Error 2");
         }
     }
 

@@ -68,6 +68,9 @@ public class Cultor {
     @JoinColumn(name = "art_discipline_id", nullable = false) // Foreign key to ArtDiscipline
     private ArtDiscipline artDiscipline;
 
+    @Column(length = 100) // Optional field for custom discipline when "Other" is selected
+    private String otherDiscipline;
+
     @Column(nullable = false) // Required years of experience in their field
     private int yearsOfExperience;
 
@@ -95,7 +98,7 @@ public class Cultor {
      */
     public Cultor(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
             String phoneNumber, String email, String instagramUser, Municipality municipality, Parish parish,
-            String homeAddress, ArtCategory artCategory, ArtDiscipline artDiscipline,
+            String homeAddress, ArtCategory artCategory, ArtDiscipline artDiscipline, String otherDiscipline,
             int yearsOfExperience, String groupName, String disability, String illness) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -110,6 +113,7 @@ public class Cultor {
         this.homeAddress = homeAddress;
         this.artCategory = artCategory;
         this.artDiscipline = artDiscipline;
+        this.otherDiscipline = otherDiscipline;
         this.yearsOfExperience = yearsOfExperience;
         this.groupName = groupName;
         this.disability = disability;
@@ -228,6 +232,14 @@ public class Cultor {
 
     public void setArtDiscipline(ArtDiscipline artDiscipline) {
         this.artDiscipline = artDiscipline;
+    }
+
+    public String getOtherDiscipline() {
+        return otherDiscipline;
+    }
+
+    public void setOtherDiscipline(String otherDiscipline) {
+        this.otherDiscipline = otherDiscipline;
     }
 
     public int getYearsOfExperience() {

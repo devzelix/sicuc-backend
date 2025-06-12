@@ -62,3 +62,26 @@
 ### 🗒️ Notes
 
 - These changes are structural and do not affect runtime behavior.
+
+## [4.0.0] - 2025-06-12
+
+### ✨ Added
+
+- **Support for selecting a custom artistic discipline ("Other")**
+  - A new optional field was added to the `Cultor` entity:
+    ```java
+    private String otherDiscipline;
+    ```
+  - This field allows users to manually specify their artistic discipline when selecting `"Otra..."` from the predefined `artDiscipline` list.
+
+### 🧪 Validation
+
+- New validation logic was implemented:
+  - If the selected `artDiscipline.name` is `"Otra..."`, the `otherDiscipline` field becomes **required**.
+  - If not provided in this case, the backend will return a validation error.
+
+### 🚨 Breaking Changes
+
+- The validation logic now enforces a requirement for the `otherDiscipline` field when `"Otra..."` is selected.
+- This may break existing forms or clients not updated to support this behavior.
+- Be sure to update frontend validations or request payloads accordingly.
