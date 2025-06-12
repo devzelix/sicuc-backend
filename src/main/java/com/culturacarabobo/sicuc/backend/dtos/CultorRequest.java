@@ -51,6 +51,9 @@ public class CultorRequest {
     private int artCategoryId; // Associated art category ID
     @Min(1)
     private int artDisciplineId; // Associated art discipline ID
+    @Size(max = 100, message = "Must Have A Maximum Of 100 Characters")
+    @Pattern(regexp = "^$|[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\\s\\-',.]{0,100}$", message = "Is Invalid")
+    private String otherDiscipline; // Optional disability description
     @Min(1)
     @Max(100)
     private int yearsOfExperience; // Years of experience (1-100)
@@ -66,9 +69,9 @@ public class CultorRequest {
 
     // Constructor with all fields
     public CultorRequest(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
-            String phoneNumber,
-            String email, String instagramUser, int municipalityId, int parishId, String homeAddress, int artCategoryId,
-            int artDisciplineId, int yearsOfExperience, String groupName, String disability, String illness) {
+            String phoneNumber, String email, String instagramUser, int municipalityId, int parishId,
+            String homeAddress, int artCategoryId, int artDisciplineId, String otherDiscipline, int yearsOfExperience,
+            String groupName, String disability, String illness) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.gender = gender;
@@ -82,6 +85,7 @@ public class CultorRequest {
         this.homeAddress = homeAddress;
         this.artCategoryId = artCategoryId;
         this.artDisciplineId = artDisciplineId;
+        this.otherDiscipline = otherDiscipline;
         this.yearsOfExperience = yearsOfExperience;
         this.groupName = groupName;
         this.disability = disability;
@@ -192,6 +196,14 @@ public class CultorRequest {
 
     public void setArtDisciplineId(int artDisciplineId) {
         this.artDisciplineId = artDisciplineId;
+    }
+
+    public String getOtherDiscipline() {
+        return otherDiscipline;
+    }
+
+    public void setOtherDiscipline(String otherDiscipline) {
+        this.otherDiscipline = otherDiscipline;
     }
 
     public int getYearsOfExperience() {
