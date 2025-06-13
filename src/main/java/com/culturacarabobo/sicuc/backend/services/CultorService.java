@@ -311,10 +311,10 @@ public class CultorService {
 
     private void validateOtherDiscipline(ArtDiscipline artDiscipline, String otherDiscipline) {
         if (!artDiscipline.getName().equals("Otra...") && otherDiscipline != null && !otherDiscipline.isBlank()) {
-            throw new IllegalArgumentException("Error");
+            throw new IllegalArgumentException("The Selected Discipline Does Not Is \"Otra...\"");
         } else if (artDiscipline.getName().equals("Otra...")
                 && (otherDiscipline == null || otherDiscipline.isBlank())) {
-            throw new IllegalArgumentException("Error 2");
+            throw new IllegalArgumentException("OtherDiscipline Is Requerid");
         }
     }
 

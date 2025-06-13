@@ -85,3 +85,9 @@
 - The validation logic now enforces a requirement for the `otherDiscipline` field when `"Otra..."` is selected.
 - This may break existing forms or clients not updated to support this behavior.
 - Be sure to update frontend validations or request payloads accordingly.
+
+## [4.0.1] - 2025-06-13
+
+### ✨ Added
+
+- Relevant comments to clarify the validation logic for the `otherDiscipline` field.
