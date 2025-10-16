@@ -91,3 +91,38 @@
 ### ✨ Added
 
 - Relevant comments to clarify the validation logic for the `otherDiscipline` field.
+
+## [5.0.0] - 2025-10-16
+
+### ✨ Added
+
+- **Implemented a full JWT authentication flow**, including:
+  - Generation of short-lived `accessToken` and long-lived `refreshToken`.
+  - New public endpoints under `/auth`:
+    - `POST /login`: To exchange user credentials for tokens.
+    - `POST /refresh`: To renew an expired `accessToken` using a `refreshToken`.
+- **Foundation for Role-Based Access Control (RBAC)** by introducing `ROLE_ADMIN`, `ROLE_EDITOR`, and `ROLE_ARTIST` roles.
+- **Strict token type validation**: Added `type` claims (`'access'` and `'refresh'`) to ensure each token can only be used for its intended purpose.
+
+### 🔧 Changed
+
+- **Completely replaced the `Basic Auth` authentication system**.
+- **Reconfigured endpoint security**:
+  - Form data endpoints (e.g., `GET /municipalities`, `/parishes`, `/art-categories`) are now public.
+  - The endpoint for registering a new cultor (`POST /cultors`) is now public.
+  - All other endpoints (e.g., `GET /cultors`) now require a valid JWT `accessToken`.
+- The `User` entity was updated to implement Spring Security's `UserDetails` and include the `role` field.
+
+### 🚨 Breaking Changes
+
+- **`Basic Auth` support has been completely removed.** Requests using this authentication method will be rejected.
+- All protected endpoints now require a **`Bearer Token`** in the `Authorization` header.
+- The authentication flow has changed. Clients **must** now call `POST /auth/login` to obtain a token before accessing protected routes.
+
+### 📣 Migration Note
+
+- **API clients must be updated** to handle the new JWT authentication flow:
+  1. Make a `POST` request to `/api/v1/auth/login` with `username` and `password`.
+  2. Securely store the received `accessToken` and `refreshToken`.
+  3. For all requests to protected endpoints, include the `accessToken` in the `Authorization: Bearer <token>` header.
+  4. Implement logic to use the `refreshToken` at the `/api/v1/auth/refresh` endpoint when the `accessToken` expires.

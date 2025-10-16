@@ -2,77 +2,69 @@ package com.culturacarabobo.sicuc.backend.entities;
 
 import java.util.Collection;
 import java.util.List;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // Specifies that this class is a JPA entity
-@Table(name = "users") // Maps this entity to the "users" table in the database
-public class User implements UserDetails { // Implements Spring Security's UserDetails for authentication
+@Entity
+@Table(name = "users")
+public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generated primary key
-    private int id;
-    @Column(nullable = false, unique = true, length = 25) // Username must be unique and not null
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(nullable = false, unique = true)
     private String username;
-    @Column(nullable = false, length = 255) // Password must not be null
+
+    @Column(nullable = false)
     private String password;
 
-    /**
-     * Default constructor required by JPA.
-     */
-    public User() {
-    }
+    @Enumerated(EnumType.STRING) // Guarda el rol como texto (ej. "ROLE_ADMIN") en la BD
+    @Column(nullable = false)
+    private Role role;
 
-    /**
-     * All-arguments constructor for easier object creation.
-     */
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    /**
-     * Returns the authorities granted to the user.
-     * Here, all users have a single role: ROLE_USER.
-     */
+    // --- Métodos de Spring Security ---
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
-    // Getters and setters
+    // --- El resto de métodos requeridos por UserDetails ---
+    @Override
+    public String getPassword() { return this.password; }
+    @Override
+    public String getUsername() { return this.username; }
+    @Override
+    public boolean isAccountNonExpired() { return true; }
+    @Override
+    public boolean isAccountNonLocked() { return true; }
+    @Override
+    public boolean isCredentialsNonExpired() { return true; }
+    @Override
+    public boolean isEnabled() { return true; }
 
-    public int getId() {
-        return id;
-    }
+    // --- Constructores, Getters y Setters (necesarios para que todo funcione) ---
+    public User() {}
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
+    public User(String username, String password, Role role) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
+        this.role = role;
     }
 
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 }
