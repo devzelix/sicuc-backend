@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.culturacarabobo.sicuc.backend.entities.ArtCategory;
 import com.culturacarabobo.sicuc.backend.entities.ArtDiscipline;
 import com.culturacarabobo.sicuc.backend.entities.Municipality;
 import com.culturacarabobo.sicuc.backend.entities.Parish;
+import com.culturacarabobo.sicuc.backend.entities.Role;
 import com.culturacarabobo.sicuc.backend.entities.User;
 import com.culturacarabobo.sicuc.backend.repositories.ArtCategoryRepository;
 import com.culturacarabobo.sicuc.backend.repositories.ArtDisciplineRepository;
@@ -28,15 +29,17 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final ArtCategoryRepository artCategoryRepository;
     private final ArtDisciplineRepository artDisciplineRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DatabaseSeeder(MunicipalityRepository municipalityRepository, ParishRepository parishRepository,
             ArtCategoryRepository artCategoryRepository, ArtDisciplineRepository artDisciplineRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.municipalityRepository = municipalityRepository;
         this.parishRepository = parishRepository;
         this.artCategoryRepository = artCategoryRepository;
         this.artDisciplineRepository = artDisciplineRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -219,9 +222,8 @@ public class DatabaseSeeder implements CommandLineRunner {
      * Seeds default users if the repository is empty.
      */
     private void seedUsers() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         List<User> users = List.of(
-                new User("admin", encoder.encode("admin")));
+                new User("admin", passwordEncoder.encode("admin"), Role.ROLE_ADMIN));
         if (userRepository.count() == 0) {
             userRepository.saveAll(users);
         }
