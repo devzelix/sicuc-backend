@@ -18,8 +18,8 @@
 
 - Renamed several packages, public classes and fields in the API, which may break backwards compatibility.
 - Examples:
-  - `Cultist` → `Cultor`
-  - Field `cultistsService` in `CultorController` renamed to `cultorService`
+  - `Cultist` → `Cultor`
+  - Field `cultistsService` in `CultorController` renamed to `cultorService`
 - Please review these changes carefully and update your code accordingly.
 
 ## [2.0.1] - 2025-05-27
@@ -68,17 +68,17 @@
 ### ✨ Added
 
 - **Support for selecting a custom artistic discipline ("Other")**
-  - A new optional field was added to the `Cultor` entity:
-    ```java
-    private String otherDiscipline;
-    ```
-  - This field allows users to manually specify their artistic discipline when selecting `"Otra..."` from the predefined `artDiscipline` list.
+  - A new optional field was added to the `Cultor` entity:
+    ```java
+    private String otherDiscipline;
+    ```
+  - This field allows users to manually specify their artistic discipline when selecting `"Otra..."` from the predefined `artDiscipline` list.
 
 ### 🧪 Validation
 
 - New validation logic was implemented:
-  - If the selected `artDiscipline.name` is `"Otra..."`, the `otherDiscipline` field becomes **required**.
-  - If not provided in this case, the backend will return a validation error.
+  - If the selected `artDiscipline.name` is `"Otra..."`, the `otherDiscipline` field becomes **required**.
+  - If not provided in this case, the backend will return a validation error.
 
 ### 🚨 Breaking Changes
 
@@ -97,10 +97,10 @@
 ### ✨ Added
 
 - **Implemented a full JWT authentication flow**, including:
-  - Generation of short-lived `accessToken` and long-lived `refreshToken`.
-  - New public endpoints under `/auth`:
-    - `POST /login`: To exchange user credentials for tokens.
-    - `POST /refresh`: To renew an expired `accessToken` using a `refreshToken`.
+  - Generation of short-lived `accessToken` and long-lived `refreshToken`.
+  - New public endpoints under `/auth`:
+    - `POST /login`: To exchange user credentials for tokens.
+    - `POST /refresh`: To renew an expired `accessToken` using a `refreshToken`.
 - **Foundation for Role-Based Access Control (RBAC)** by introducing `ROLE_ADMIN`, `ROLE_EDITOR`, and `ROLE_ARTIST` roles.
 - **Strict token type validation**: Added `type` claims (`'access'` and `'refresh'`) to ensure each token can only be used for its intended purpose.
 
@@ -108,9 +108,9 @@
 
 - **Completely replaced the `Basic Auth` authentication system**.
 - **Reconfigured endpoint security**:
-  - Form data endpoints (e.g., `GET /municipalities`, `/parishes`, `/art-categories`) are now public.
-  - The endpoint for registering a new cultor (`POST /cultors`) is now public.
-  - All other endpoints (e.g., `GET /cultors`) now require a valid JWT `accessToken`.
+  - Form data endpoints (e.g., `GET /municipalities`, `/parishes`, `/art-categories`) are now public.
+  - The endpoint for registering a new cultor (`POST /cultors`) is now public.
+  - All other endpoints (e.g., `GET /cultors`) now require a valid JWT `accessToken`.
 - The `User` entity was updated to implement Spring Security's `UserDetails` and include the `role` field.
 
 ### 🚨 Breaking Changes
@@ -122,7 +122,31 @@
 ### 📣 Migration Note
 
 - **API clients must be updated** to handle the new JWT authentication flow:
-  1. Make a `POST` request to `/api/v1/auth/login` with `username` and `password`.
-  2. Securely store the received `accessToken` and `refreshToken`.
-  3. For all requests to protected endpoints, include the `accessToken` in the `Authorization: Bearer <token>` header.
-  4. Implement logic to use the `refreshToken` at the `/api/v1/auth/refresh` endpoint when the `accessToken` expires.
+  1. Make a `POST` request to `/api/v1/auth/login` with `username` and `password`.
+  2. Securely store the received `accessToken` and `refreshToken`.
+  3. For all requests to protected endpoints, include the `accessToken` in the `Authorization: Bearer <token>` header.
+  4. Implement logic to use the `refreshToken` at the `/api/v1/auth/refresh` endpoint when the `accessToken` expires.
+
+---
+
+## [5.1.0] - 2025-10-20
+
+### ✨ Added
+
+- **Full Dockerization of the Application and Database.**
+  - Creation of a **`Dockerfile`** using a **Multi-Stage Build** (Java 21/Maven) to generate minimal and secure production images.
+  - Implementation of **`docker-compose.prod.yml`** for stable deployment in production environments (backend and MySQL).
+  - Implementation of **`docker-compose.dev.yml`** for a fast local development environment with volumes and improved DX.
+  - Configuration of the **`.env`** file to centralize all environment variables (DB credentials, JWT keys, etc.).
+  - Configured service **healthchecks** and `depends_on` to ensure the backend container waits for the database to be ready.
+- **VS Code Dev Containers Support** for a unified development environment.
+
+### 🔧 Changed
+
+- The build process was updated to produce a slim, container-ready image.
+- Database DDL configuration was separated between environments (`dev` vs. `prod`).
+
+### 📣 Migration Note
+
+- The primary execution method shifts from running a local JAR to **`docker compose -f docker-compose.prod.yml up -d`**.
+- The next step for production safety is the implementation of **Flyway** for secure database schema management (`DDL_AUTO=none`).

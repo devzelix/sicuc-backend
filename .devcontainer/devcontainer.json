@@ -1,0 +1,29 @@
+{
+  "name": "SICUC Backend Dev Environment",
+  
+  "dockerComposeFile": [
+    "../docker-compose.dev.yml"
+  ],
+  
+  // ✅ El Dev Container ahora sabe que debe levantar estos servicios
+  // y construir la imagen, sin necesidad de perfiles especiales.
+  
+  "service": "sicuc-backend",
+  "workspaceFolder": "/app",
+  "remoteUser": "root",
+  
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.server.launchMode": "Standard" 
+      },
+      "extensions": [
+        "vscjava.vscode-java-pack", 
+        "vmware.vscode-spring-boot",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+  
+  "postCreateCommand": "sh"
+}
