@@ -24,6 +24,7 @@ public class AuthenticationService {
         this.jwtService = jwtService;
     }
 
+    @SuppressWarnings("null")
     public AuthResponse login(AuthRequest request) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -39,13 +40,16 @@ public class AuthenticationService {
 
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
+        @SuppressWarnings("null")
         String username = jwtService.extractUsername(refreshToken);
 
         if (username != null) {
             // --- CAMBIO 5: Esta línea ahora funcionará correctamente ---
             UserDetails userDetails = this.userService.loadUserByUsername(username);
-
-            if (jwtService.isTokenValid(refreshToken, userDetails)) {
+            @SuppressWarnings("null")
+            boolean valid = jwtService.isTokenValid(refreshToken, userDetails);
+            if (valid) {
+                @SuppressWarnings("null")
                 String tokenType = jwtService.extractClaim(refreshToken, claims -> claims.get("type", String.class));
                 if ("refresh".equals(tokenType)) {
                     String newAccessToken = jwtService.generateToken(userDetails);

@@ -50,6 +50,7 @@ public class CultorController {
      * @param hasIllness      Optional filter by presence of illness.
      * @return List of CultorResponse DTOs matching the filters.
      */
+    @SuppressWarnings("null")
     @GetMapping
     public List<CultorResponse> getCultorsFiltered(
             @RequestParam(required = false) String query,
@@ -72,6 +73,7 @@ public class CultorController {
      * @return ResponseEntity with the created CultorResponse and appropriate HTTP
      *         status.
      */
+    @SuppressWarnings("null")
     @PostMapping
     public ResponseEntity<CultorResponse> create(@Valid @RequestBody CultorRequest cultorRequest) {
         return cultorService.create(cultorRequest);

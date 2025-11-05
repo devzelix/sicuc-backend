@@ -59,6 +59,7 @@ public class DatabaseSeeder implements CommandLineRunner {
      *
      * @return a list of inserted municipalities or null if already seeded
      */
+    @SuppressWarnings("null")
     private List<Municipality> seedMunicipalities() {
 
         List<Municipality> municipalities = List.of(
@@ -89,6 +90,7 @@ public class DatabaseSeeder implements CommandLineRunner {
      *
      * @param municipalities list of parent municipalities
      */
+    @SuppressWarnings("null")
     private void seedParishes(List<Municipality> municipalities) {
         if (municipalities != null) {
             List<Parish> parishes = List.of(
@@ -141,6 +143,7 @@ public class DatabaseSeeder implements CommandLineRunner {
      *
      * @return a list of inserted art categories or null if already seeded
      */
+    @SuppressWarnings("null")
     private List<ArtCategory> seedArtCategories() {
 
         List<ArtCategory> artCategories = List.of(
@@ -164,6 +167,7 @@ public class DatabaseSeeder implements CommandLineRunner {
      *
      * @param artCategories list of parent art categories
      */
+    @SuppressWarnings("null")
     private void seedArtDisciplines(List<ArtCategory> artCategories) {
         if (artCategories != null) {
             List<ArtDiscipline> disciplines = List.of(
@@ -221,6 +225,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     /**
      * Seeds default users if the repository is empty.
      */
+    @SuppressWarnings("null")
     private void seedUsers() {
         List<User> users = List.of(
                 new User("admin", passwordEncoder.encode("admin"), Role.ROLE_ADMIN));

@@ -107,6 +107,7 @@ public class CultorService {
      * @param hasIllness      Filter by illness presence.
      * @return List of CultorResponse DTOs matching filters.
      */
+    @SuppressWarnings("null")
     public List<CultorResponse> getAllCultorsWithFilters(String query, String gender, Integer municipalityId,
             Integer parishId,
             Integer artCategoryId, Integer artDisciplineId,
@@ -132,6 +133,7 @@ public class CultorService {
      * @throws IllegalArgumentException If validation fails.
      * @throws EntityNotFoundException  If related entities are not found.
      */
+    @SuppressWarnings("null")
     private Cultor toCultor(CultorRequest cultorRequest) {
 
         // Validate and normalize names
