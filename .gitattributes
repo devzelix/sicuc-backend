@@ -1,2 +1,10 @@
-/mvnw text eol=lf
+# 1. Normalizar todo el código fuente (por defecto)
+# Esto asegura que todos los archivos de texto sean LF en el repositorio.
+* text=auto eol=lf
+
+# 2. Excepciones que requieren CRLF para funcionar en Windows (¡MANTENER!)
+# Si estos archivos no están en CRLF, los scripts de Windows fallarán.
 *.cmd text eol=crlf
+
+# 3. Scripts que deben ser LF (¡MANTENER!)
+/mvnw text eol=lf
