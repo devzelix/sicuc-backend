@@ -27,6 +27,7 @@ public class ArtDisciplineService {
      *
      * @return a list of ArtDisciplineResponse DTOs
      */
+    @SuppressWarnings("null")
     public List<ArtDisciplineResponse> getAll() {
         return artDisciplineRepository.findAll(Sort.by("id")).stream().map(this::toArtDisciplineResponse)
                 .collect(Collectors.toList());

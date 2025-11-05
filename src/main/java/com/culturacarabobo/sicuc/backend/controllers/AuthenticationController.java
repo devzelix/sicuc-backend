@@ -21,12 +21,14 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
+    @SuppressWarnings("null")
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         // El controlador solo pasa la orden al servicio
         return ResponseEntity.ok(authenticationService.login(request));
     }
 
+    @SuppressWarnings("null")
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
         // Y aquí también

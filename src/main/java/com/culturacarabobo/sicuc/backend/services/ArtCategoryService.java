@@ -27,6 +27,7 @@ public class ArtCategoryService {
      *
      * @return a list of ArtCategoryResponse DTOs
      */
+    @SuppressWarnings("null")
     public List<ArtCategoryResponse> getAll() {
         return artCategoryRepository.findAll(Sort.by("id")).stream()
                 .map(this::toArtCategoryResponse)

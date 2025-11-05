@@ -27,6 +27,7 @@ public class MunicipalityService {
      *
      * @return a list of MunicipalityResponse DTOs
      */
+    @SuppressWarnings("null")
     public List<MunicipalityResponse> getAll() {
         return municipalityRepository.findAll(Sort.by("id")).stream()
                 .map(this::toMunicipalityResponse)

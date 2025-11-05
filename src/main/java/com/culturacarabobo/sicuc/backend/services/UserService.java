@@ -32,6 +32,7 @@ public class UserService implements UserDetailsService {
      * @return UserDetails object containing user information.
      * @throws UsernameNotFoundException if the user is not found in the repository.
      */
+    @SuppressWarnings("null")
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);

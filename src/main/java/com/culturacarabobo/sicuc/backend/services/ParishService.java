@@ -27,6 +27,7 @@ public class ParishService {
      *
      * @return a list of ParishResponse DTOs
      */
+    @SuppressWarnings("null")
     public List<ParishResponse> getAll() {
         return parishRepository.findAll(Sort.by("id")).stream().map(this::toParishResponse)
                 .collect(Collectors.toList());
