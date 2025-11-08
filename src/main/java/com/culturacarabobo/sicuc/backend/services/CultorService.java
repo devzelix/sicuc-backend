@@ -3,9 +3,9 @@ package com.culturacarabobo.sicuc.backend.services;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -162,20 +162,22 @@ public class CultorService {
      * @param hasIllness      Filter by illness presence.
      * @return List of CultorResponse DTOs matching filters.
      */
-    @SuppressWarnings("null")
-    public List<CultorResponse> getAllCultorsWithFilters(String query, String gender, Integer municipalityId,
+    public Page<CultorResponse> getAllCultorsWithFilters(String query, String gender, Integer municipalityId,
             Integer parishId,
             Integer artCategoryId, Integer artDisciplineId,
-            Boolean hasDisability, Boolean hasIllness) {
+            Boolean hasDisability, Boolean hasIllness,
+            Pageable pageable) {
         Specification<Cultor> specification = CultorSpecification.withFilters(query,
                 gender, municipalityId, parishId, artCategoryId, artDisciplineId, hasDisability,
                 hasIllness);
 
-        // Fetch and convert entities to response DTOs
-        return cultorRepository.findAll(specification)
-                .stream()
-                .map(this::toCultorResponse)
-                .collect(Collectors.toList());
+        // 2. BUSCA USANDO EL REPOSITORIO CON LA ESPECIFICACIÓN Y EL PAGEABLE
+        // Esto ya no devuelve una List<Cultor>, sino un Page<Cultor>
+        Page<Cultor> cultorPage = cultorRepository.findAll(specification, pageable);
+
+        // 3. CONVIERTE EL CONTENIDO DE LA PÁGINA
+        // El método .map() de Page hace la conversión manteniendo la info de paginación
+        return cultorPage.map(this::toCultorResponse);
     }
 
     /**
