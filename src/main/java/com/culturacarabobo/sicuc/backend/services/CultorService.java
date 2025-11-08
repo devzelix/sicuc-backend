@@ -86,10 +86,65 @@ public class CultorService {
         }
 
         // Convert DTO to entity, validate fields, and save
-        Cultor cultor = toCultor(cultorRequest);
+        Cultor cultor = mapAndValidateCultor(new Cultor(), cultorRequest);
         Cultor saved = cultorRepository.save(cultor);
 
         // Convert saved entity to response DTO and return
+        return ResponseEntity.ok(toCultorResponse(saved));
+    }
+
+    /**
+     * NUEVO MÉTODO: Actualiza un Cultor existente.
+     *
+     * @param id            ID del cultor a actualizar.
+     * @param cultorRequest DTO con los nuevos datos.
+     * @return ResponseEntity con el CultorResponse actualizado.
+     * @throws EntityNotFoundException  si el cultor no se encuentra.
+     * @throws DuplicateEntityException si los nuevos datos únicos ya existen en otro cultor.
+     * @throws IllegalArgumentException si la validación de datos falla.
+     */
+    public ResponseEntity<CultorResponse> update(Integer id, CultorRequest cultorRequest) {
+        // 1. Buscar el cultor existente
+        Cultor cultorExisting = cultorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cultor Not Found With Id: " + id));
+
+        // 2. VALIDACIÓN DE INMUTABILIDAD (¡NUEVO!)
+        // Verificamos que la cédula en el request sea la misma que la guardada.
+        if (!cultorExisting.getIdNumber().equals(cultorRequest.getIdNumber())) {
+            throw new IllegalArgumentException("The IdNumber (Cédula) cannot be modified.");
+        }
+        
+        // Verificamos que la fecha de nacimiento sea la misma.
+        if (!cultorExisting.getBirthDate().equals(cultorRequest.getBirthDate())) {
+             throw new IllegalArgumentException("The Birth Date cannot be modified.");
+        }
+
+        // 3. Validar campos únicos (excluyendo al cultor actual)
+        if (cultorRepository.existsByPhoneNumberAndIdNot(cultorRequest.getPhoneNumber(), id))
+            throw new DuplicateEntityException("Phone Number Already Exists");
+
+        String email = cultorRequest.getEmail();
+        if (email != null && !email.trim().isEmpty()) {
+            email = email.toLowerCase();
+            if (cultorRepository.existsByEmailAndIdNot(email, id))
+                throw new DuplicateEntityException("Email Already Exists");
+        }
+
+        String instagramUser = cultorRequest.getInstagramUser();
+        if (instagramUser != null && !instagramUser.trim().isEmpty()) {
+            instagramUser = instagramUser.toLowerCase();
+            if (cultorRepository.existsByInstagramUserAndIdNot(instagramUser, id))
+                throw new DuplicateEntityException("Instagram Username Already Exists");
+        }
+
+        // 3. Mapear y validar los datos del DTO a la entidad existente
+        // Usamos el método refactorizado
+        mapAndValidateCultor(cultorExisting, cultorRequest);
+
+        // 4. Guardar los cambios
+        Cultor saved = cultorRepository.save(cultorExisting);
+
+        // 5. Devolver la respuesta
         return ResponseEntity.ok(toCultorResponse(saved));
     }
 
@@ -124,17 +179,16 @@ public class CultorService {
     }
 
     /**
-     * Converts CultorRequest DTO to Cultor entity after validating and
-     * normalizing input data.
-     * Also verifies existence and consistency of related entities.
-     * 
-     * @param cultorRequest Incoming DTO with cultor data.
-     * @return Cultor entity ready for persistence.
-     * @throws IllegalArgumentException If validation fails.
-     * @throws EntityNotFoundException  If related entities are not found.
+     * MÉTODO 'toCultor' REFACTORIZADO Y RENOMBRADO
+     * Ahora se llama 'mapAndValidateCultor' y actualiza un objeto 'Cultor' existente
+     * o uno nuevo.
+     *
+     * @param cultor        La entidad Cultor a rellenar (puede ser nueva o existente).
+     * @param cultorRequest Incoming DTO con cultor data.
+     * @return El objeto Cultor (pasado como argumento) rellenado y validado.
      */
     @SuppressWarnings("null")
-    private Cultor toCultor(CultorRequest cultorRequest) {
+    private Cultor mapAndValidateCultor(Cultor cultor, CultorRequest cultorRequest) {
 
         // Validate and normalize names
         String firstName = cultorRequest.getFirstName();
@@ -224,7 +278,6 @@ public class CultorService {
         }
 
         // Create and populate Cultor entity
-        Cultor cultor = new Cultor();
         cultor.setFirstName(firstName);
         cultor.setLastName(lastName);
         cultor.setGender(gender);

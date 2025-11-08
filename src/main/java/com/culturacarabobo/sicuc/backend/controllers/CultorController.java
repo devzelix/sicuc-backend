@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -77,6 +79,23 @@ public class CultorController {
     @PostMapping
     public ResponseEntity<CultorResponse> create(@Valid @RequestBody CultorRequest cultorRequest) {
         return cultorService.create(cultorRequest);
+    }
+
+    /**
+     * NUEVO ENDPOINT:
+     * PUT endpoint para actualizar un cultor existente por su ID.
+     *
+     * @param id            El ID del cultor a actualizar (viene de la URL).
+     * @param cultorRequest DTO con los datos para actualizar.
+     * @return ResponseEntity con el CultorResponse actualizado.
+     */
+    @SuppressWarnings("null")
+    @PutMapping("/{id}")
+    public ResponseEntity<CultorResponse> update(
+            @PathVariable Integer id,
+            @Valid @RequestBody CultorRequest cultorRequest) {
+        
+        return cultorService.update(id, cultorRequest);
     }
 
 }
