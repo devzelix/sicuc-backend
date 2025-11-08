@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -96,6 +97,18 @@ public class CultorController {
             @Valid @RequestBody CultorRequest cultorRequest) {
         
         return cultorService.update(id, cultorRequest);
+    }
+
+    /**
+     * DELETE endpoint para eliminar un cultor por su ID.
+     *
+     * @param id El ID del cultor a eliminar (viene de la URL).
+     * @return ResponseEntity con el status apropiado (204 o 404).
+     */
+    @SuppressWarnings("null")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        return cultorService.delete(id);
     }
 
 }
