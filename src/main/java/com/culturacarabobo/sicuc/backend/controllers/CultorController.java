@@ -111,4 +111,16 @@ public class CultorController {
         return cultorService.delete(id);
     }
 
+    /**
+     * GET endpoint para obtener un cultor por su ID.
+     *
+     * @param id El ID del cultor a obtener (viene de la URL).
+     * @return ResponseEntity con el CultorResponse y status 200 o 404.
+     */
+    @SuppressWarnings("null")
+    @GetMapping("/{id}")
+    public ResponseEntity<CultorResponse> getById(@PathVariable Integer id) {
+        return cultorService.getById(id);
+    }
+
 }

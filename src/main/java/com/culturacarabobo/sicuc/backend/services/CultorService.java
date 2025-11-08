@@ -393,4 +393,21 @@ public class CultorService {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Obtiene un cultor por su ID.
+     *
+     * @param id El ID del cultor a buscar.
+     * @return ResponseEntity con el CultorResponse (DTO).
+     * @throws EntityNotFoundException si el cultor no se encuentra.
+     */
+    @SuppressWarnings("null")
+    public ResponseEntity<CultorResponse> getById(Integer id) {
+        // 1. Buscar el cultor por ID o lanzar 404
+        Cultor cultor = cultorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cultor Not Found With Id: " + id));
+
+        // 2. Convertir la entidad a DTO y devolverlo con un 200 OK
+        return ResponseEntity.ok(toCultorResponse(cultor));
+    }
+
 }
