@@ -30,4 +30,12 @@ public interface CultorRepository extends JpaRepository<Cultor, Integer>, JpaSpe
      */
     boolean existsByInstagramUser(String instragramUser);
 
+    boolean existsByIdNumberAndIdNot(String idNumber, Integer id);
+
+    boolean existsByPhoneNumberAndIdNot(String phoneNumber, Integer id);
+
+    boolean existsByEmailAndIdNot(String email, Integer id);
+
+    boolean existsByInstagramUserAndIdNot(String instagramUser, Integer id);
+
 }
