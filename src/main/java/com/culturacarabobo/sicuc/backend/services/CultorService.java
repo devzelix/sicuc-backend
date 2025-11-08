@@ -373,4 +373,24 @@ public class CultorService {
         }
     }
 
+    /**
+     * Elimina un cultor por su ID.
+     *
+     * @param id El ID del cultor a eliminar.
+     * @return ResponseEntity sin contenido (204 No Content).
+     * @throws EntityNotFoundException si el cultor no se encuentra.
+     */
+    public ResponseEntity<Void> delete(Integer id) {
+        // 1. Verificar si el cultor existe antes de intentar borrar
+        if (!cultorRepository.existsById(id)) {
+            throw new EntityNotFoundException("Cultor Not Found With Id: " + id);
+        }
+
+        // 2. Si existe, eliminarlo
+        cultorRepository.deleteById(id);
+
+        // 3. Devolver una respuesta HTTP 204 No Content (éxito, sin cuerpo)
+        return ResponseEntity.noContent().build();
+    }
+
 }
