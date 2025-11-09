@@ -2,6 +2,7 @@ package com.culturacarabobo.sicuc.backend.services;
 
 import jakarta.persistence.EntityNotFoundException;
 
+import java.net.URI;
 import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
@@ -62,6 +63,7 @@ public class CultorService {
      *                                  or Instagram username exists.
      * @throws IllegalArgumentException if data validation fails.
      */
+    @SuppressWarnings("null")
     public ResponseEntity<CultorResponse> create(CultorRequest cultorRequest) {
         // Check if any unique fields already exist in the database
         if (cultorRepository.existsByIdNumber(cultorRequest.getIdNumber()))
@@ -89,8 +91,13 @@ public class CultorService {
         Cultor cultor = mapAndValidateCultor(new Cultor(), cultorRequest);
         Cultor saved = cultorRepository.save(cultor);
 
-        // Convert saved entity to response DTO and return
-        return ResponseEntity.ok(toCultorResponse(saved));
+        // --- INICIO DEL CAMBIO ---
+        // Creamos la URI para el nuevo recurso (ej. /cultors/5)
+        URI location = URI.create("/cultors/" + saved.getId());
+
+        // Devolvemos 201 Created, con la URI en la cabecera 'Location'
+        return ResponseEntity.created(location).body(toCultorResponse(saved));
+        // --- FIN DEL CAMBIO ---
     }
 
     /**
