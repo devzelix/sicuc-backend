@@ -115,22 +115,25 @@ public class CultorSpecification {
 
             // Filter by municipality if provided
             if (municipalityId != null) {
-                predicates.add(cb.equal(root.get("municipality").get("id"), municipalityId));
+                predicates.add(cb.equal(root.join("municipality").get("id"), municipalityId));
             }
 
             // Filter by parish if provided
             if (parishId != null) {
-                predicates.add(cb.equal(root.get("parish").get("id"), parishId));
+                // CAMBIA .get("parish") POR .join("parish")
+                predicates.add(cb.equal(root.join("parish").get("id"), parishId));
             }
 
             // Filter by art category if provided
             if (artCategoryId != null) {
-                predicates.add(cb.equal(root.get("artCategory").get("id"), artCategoryId));
+                // CAMBIA .get("artCategory") POR .join("artCategory")
+                predicates.add(cb.equal(root.join("artCategory").get("id"), artCategoryId));
             }
 
             // Filter by art discipline if provided
             if (artDisciplineId != null) {
-                predicates.add(cb.equal(root.get("artDiscipline").get("id"), artDisciplineId));
+                // CAMBIA .get("artDiscipline") POR .join("artDiscipline")
+                predicates.add(cb.equal(root.join("artDiscipline").get("id"), artDisciplineId));
             }
 
             // Filter by presence or absence of disability
