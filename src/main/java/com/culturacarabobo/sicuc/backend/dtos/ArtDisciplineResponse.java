@@ -1,21 +1,34 @@
 package com.culturacarabobo.sicuc.backend.dtos;
 
 /**
- * Data Transfer Object for Art Discipline response.
+ * Data Transfer Object (DTO) for sending {@link com.culturacarabobo.sicuc.backend.entities.ArtDiscipline}
+ * data to the client.
+ * <p>
+ * This is an immutable data carrier class.
  */
-public class ArtDisciplineResponse {
-
-    // Unique identifier of the art discipline
-    private int id;
-
-    // Name of the art discipline
-    private String name;
-
-    // ID of the related art category
-    private int artCategoryId;
+public final class ArtDisciplineResponse {
 
     /**
-     * Constructor to initialize all fields of ArtDisciplineResponse.
+     * The unique identifier (primary key) for the art discipline.
+     */
+    private final int id;
+
+    /**
+     * The name of the art discipline (e.g., "Guitarra").
+     */
+    private final String name;
+
+    /**
+     * The foreign key ID of the parent {@link com.culturacarabobo.sicuc.backend.entities.ArtCategory}.
+     */
+    private final int artCategoryId;
+
+    /**
+     * Constructs a new ArtDisciplineResponse.
+     *
+     * @param id            The ID of the discipline.
+     * @param name          The name of the discipline.
+     * @param artCategoryId The ID of the parent category.
      */
     public ArtDisciplineResponse(int id, String name, int artCategoryId) {
         this.id = id;
@@ -23,30 +36,18 @@ public class ArtDisciplineResponse {
         this.artCategoryId = artCategoryId;
     }
 
-    // Getters and setters
+    // --- Standard Getters ---
+    // (No setters are provided, as this is an immutable DTO)
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getArtCategoryId() {
         return artCategoryId;
     }
-
-    public void setArtCategoryId(int artCategoryId) {
-        this.artCategoryId = artCategoryId;
-    }
-
 }

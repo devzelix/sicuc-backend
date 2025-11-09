@@ -11,37 +11,51 @@ import com.culturacarabobo.sicuc.backend.entities.ArtDiscipline;
 import com.culturacarabobo.sicuc.backend.repositories.ArtDisciplineRepository;
 
 /**
- * Service class responsible for operations related to Art Disciplines.
+ * Service layer for managing {@link ArtDiscipline} entities.
+ * <p>
+ * This service handles retrieving art disciplines, primarily for populating
+ * form dropdowns.
  */
 @Service
 public class ArtDisciplineService {
 
     private final ArtDisciplineRepository artDisciplineRepository;
 
+    /**
+     * Constructs the service with the required repository.
+     *
+     * @param artDisciplineRepository Repository for {@link ArtDiscipline} data
+     * access.
+     */
     public ArtDisciplineService(ArtDisciplineRepository artDisciplineRepository) {
         this.artDisciplineRepository = artDisciplineRepository;
     }
 
     /**
-     * Retrieves all art disciplines sorted by ID and maps them to DTOs.
+     * Retrieves all art disciplines, sorted by their ID in ascending order.
      *
-     * @return a list of ArtDisciplineResponse DTOs
+     * @return A {@link List} of {@link ArtDisciplineResponse} DTOs.
      */
     @SuppressWarnings("null")
     public List<ArtDisciplineResponse> getAll() {
-        return artDisciplineRepository.findAll(Sort.by("id")).stream().map(this::toArtDisciplineResponse)
+        // Find all disciplines, sort by ID to ensure consistent ordering
+        return artDisciplineRepository.findAll(Sort.by("id")).stream()
+                .map(this::toArtDisciplineResponse) // Convert each entity to a DTO
                 .collect(Collectors.toList());
     }
 
     /**
-     * Converts an ArtDiscipline entity to its DTO representation.
+     * Private helper method to convert an {@link ArtDiscipline} entity to its DTO
+     * representation.
      *
-     * @param artDiscipline the ArtDiscipline entity
-     * @return the corresponding ArtDisciplineResponse DTO
+     * @param artDiscipline The {@link ArtDiscipline} entity to convert.
+     * @return The corresponding {@link ArtDisciplineResponse} DTO.
      */
-    public ArtDisciplineResponse toArtDisciplineResponse(ArtDiscipline artDiscipline) {
-        return new ArtDisciplineResponse(artDiscipline.getId(), artDiscipline.getName(),
-                artDiscipline.getArtCategory().getId());
+    private ArtDisciplineResponse toArtDisciplineResponse(ArtDiscipline artDiscipline) {
+        return new ArtDisciplineResponse(
+                artDiscipline.getId(),
+                artDiscipline.getName(),
+                artDiscipline.getArtCategory().getId()
+        );
     }
-
 }

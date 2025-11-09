@@ -16,85 +16,166 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-@Entity // Specifies that this class is a JPA entity
-@EntityListeners(AuditingEntityListener.class) // Enables auditing listener for automatic timestamp management
-@Table(name = "cultors") // Maps to the "cultors" table in the database
+/**
+ * Represents a "Cultor" (cultural artist/artisan) entity.
+ * <p>
+ * This is the core entity mapping to the {@code cultors} table in the database.
+ * It includes personal information, contact details, location, and artistic
+ * specialization.
+ * <p>
+ * {@link AuditingEntityListener} is used to automatically populate
+ * {@code createdAt}.
+ */
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "cultors")
 public class Cultor {
 
+    /**
+     * The unique identifier (primary key) for the cultor.
+     * Auto-incremented by the database.
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generated primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(length = 50, nullable = false) // First name, required, max length 50
+    /**
+     * The cultor's first name(s). Required.
+     */
+    @Column(length = 50, nullable = false)
     private String firstName;
 
-    @Column(length = 50, nullable = false) // Last name, required, max length 50
+    /**
+     * The cultor's last name(s). Required.
+     */
+    @Column(length = 50, nullable = false)
     private String lastName;
 
-    @Column(length = 1, nullable = false) // Gender (e.g., M/F/O), required, 1 character
+    /**
+     * The cultor's gender (e.g., "M" or "F"). Required.
+     */
+    @Column(length = 1, nullable = false)
     private String gender;
 
-    @Column(length = 10, nullable = false, unique = true) // National ID number, required and unique
+    /**
+     * The cultor's national identification number (e.g., "V-12345678").
+     * Required and must be unique.
+     */
+    @Column(length = 10, nullable = false, unique = true)
     private String idNumber;
 
-    @Column(nullable = false) // Birth date, required
+    /**
+     * The cultor's date of birth. Required.
+     * This field is immutable after creation (enforced by CultorService).
+     */
+    @Column(nullable = false)
     private LocalDate birthDate;
 
-    @Column(length = 12, nullable = false, unique = true) // Phone number, required and unique
+    /**
+     * The cultor's primary phone number (e.g., "0412-1234567").
+     * Required and must be unique.
+     */
+    @Column(length = 12, nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(length = 150, unique = true) // Optional Email, unique if provided
+    /**
+     * The cultor's email address. Optional, but must be unique if provided.
+     */
+    @Column(length = 150, unique = true)
     private String email;
 
-    @Column(length = 30, unique = true) // Optional Instagram username, unique if provided
+    /**
+     * The cultor's Instagram handle (e.g., "@username"). Optional, but must be
+     * unique if provided.
+     */
+    @Column(length = 30, unique = true)
     private String instagramUser;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many cultors belong to one municipality
-    @JoinColumn(name = "municipality_id", nullable = false) // Foreign key to Municipality
+    /**
+     * The {@link Municipality} where the cultor resides.
+     * This is a many-to-one relationship.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "municipality_id", nullable = false)
     private Municipality municipality;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many cultors belong to one parish
-    @JoinColumn(name = "parish_id", nullable = false) // Foreign key to Parish
+    /**
+     * The {@link Parish} where the cultor resides.
+     * This is a many-to-one relationship.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parish_id", nullable = false)
     private Parish parish;
 
-    @Column(length = 100, nullable = false) // Full home address, required
+    /**
+     * The cultor's full home address. Required.
+     */
+    @Column(length = 100, nullable = false)
     private String homeAddress;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many cultors can belong to one art category
-    @JoinColumn(name = "art_category_id", nullable = false) // Foreign key to ArtCategory
+    /**
+     * The {@link ArtCategory} of the cultor's primary discipline.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "art_category_id", nullable = false)
     private ArtCategory artCategory;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many cultors can belong to one art discipline
-    @JoinColumn(name = "art_discipline_id", nullable = false) // Foreign key to ArtDiscipline
+    /**
+     * The {@link ArtDiscipline} of the cultor.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "art_discipline_id", nullable = false)
     private ArtDiscipline artDiscipline;
 
-    @Column(length = 100) // Optional field for custom discipline when "Other" is selected
+    /**
+     * A free-text field for a custom discipline, only used if the selected
+     * {@link ArtDiscipline} is "Otra...".
+     */
+    @Column(length = 100)
     private String otherDiscipline;
 
-    @Column(nullable = false) // Required years of experience in their field
+    /**
+     * The number of years the cultor has been active in their field. Required.
+     */
+    @Column(nullable = false)
     private int yearsOfExperience;
 
-    @Column(length = 100) // Optional group affiliation
+    /**
+     * The name of any group, collective, or association the cultor belongs to.
+     * Optional.
+     */
+    @Column(length = 100)
     private String groupName;
 
-    @Column(length = 100) // Optional field for recording disability
+    /**
+     * Description of any disability the cultor has. Optional.
+     */
+    @Column(length = 100)
     private String disability;
 
-    @Column(length = 100) // Optional field for recording illness
+    /**
+     * Description of any chronic illness the cultor has. Optional.
+     */
+    @Column(length = 100)
     private String illness;
 
-    @CreatedDate // Automatically assigned creation date and time on entity persist
-    @Column(nullable = false, updatable = false) // Cannot be null or updated once set
+    /**
+     * Timestamp of when this cultor was first created.
+     * Automatically set by {@link AuditingEntityListener} and cannot be updated.
+     */
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDate createdAt;
 
     /**
-     * Default constructor for JPA.
+     * Default constructor required by JPA.
      */
     public Cultor() {
     }
 
     /**
-     * All-arguments constructor to facilitate object creation.
+     * All-arguments constructor for creating new Cultor instances.
+     * (Generated by IDE or written manually).
      */
     public Cultor(String firstName, String lastName, String gender, String idNumber, LocalDate birthDate,
             String phoneNumber, String email, String instagramUser, Municipality municipality, Parish parish,
@@ -120,7 +201,7 @@ public class Cultor {
         this.illness = illness;
     }
 
-    // Getters and setters
+    // --- Standard Getters and Setters ---
 
     public int getId() {
         return id;
@@ -281,5 +362,4 @@ public class Cultor {
     public void setCreatedAt(LocalDate createdAt) {
         this.createdAt = createdAt;
     }
-
 }

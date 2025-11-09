@@ -1,44 +1,54 @@
+# ===================================================================
+# == MULTI-STAGE BUILD CONFIGURATION
+# ===================================================================
+
+# This pattern ensures the final production image (runtime) is minimal 
+# and secure, as it only contains the JRE and the final compiled JAR.
+
 # -----------------------------------------------------------
-# STAGE 1: COMPILACIÓN Y DESARROLLO (BUILDER/DEV)
-# Esta etapa sirve como el entorno de trabajo interactivo para VS Code.
+# STAGE 1: COMPILATION AND DEVELOPMENT (BUILDER/DEV)
+# Base: Uses the full Java Development Kit (JDK) on a minimal Alpine image.
+# This stage serves as the interactive development and compilation environment.
 # -----------------------------------------------------------
 FROM eclipse-temurin:21-jdk-alpine AS builder
 
-# Instalar herramientas de desarrollo
+# Install necessary development tools (Maven, Git)
 RUN apk add --no-cache maven git
 
-# Directorio de trabajo
+# Set the working directory
 WORKDIR /app
 
-# 1. Copiar el POM y descargar dependencias (para optimizar el caché)
+# 1. Copy POM and download dependencies for efficient caching.
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# 2. Copiar el código fuente restante
+# 2. Copy the source code
 COPY . .
 
-# Comando de compilación (Solo se ejecuta durante el Build para generar el JAR)
-# Se deja aquí para que Docker pueda cachear el JAR si es necesario.
+# Final compilation command (only runs during the build process)
+# DskipTests is used because tests are run separately by the CI pipeline.
 RUN mvn clean package -DskipTests
 
-# 🔑 CLAVE PARA DEV: El comando final (CMD) para esta etapa es 'sh', 
-# permitiendo a VS Code inyectar su propia conexión y comandos.
-# Esto asegura que el contenedor Dev Container se inicie en un shell interactivo.
+# KEY FOR DEV: CMD is 'sh', allowing VS Code/Dev Containers 
+# to inject their own connection and commands for interactive work.
 CMD ["sh"]
 
 # -----------------------------------------------------------
-# STAGE 2: EJECUCIÓN EN PRODUCCIÓN (RUNTIME)
-# Esta etapa solo se usa cuando se construye la imagen final para PROD.
+# STAGE 2: PRODUCTION EXECUTION (RUNTIME)
+# Base: Uses the minimal Java Runtime Environment (JRE) on Alpine.
+# This stage builds the final, secure, and compact production image.
 # -----------------------------------------------------------
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
 WORKDIR /app
 
-# Copiar el JAR compilado desde la etapa 'builder'
+# CRITICAL: Copy only the compiled application JAR from the 'builder' stage.
+# This discards all development tools (JDK, Maven, Git), resulting in a small image.
 COPY --from=builder /app/target/*.jar app.jar
 
-# Exponer el puerto de Spring Boot
+# Expose the application port
 EXPOSE 8080
 
-# Comando de ejecución de la aplicación final (Para PROD)
+# Command to execute the final application (For PROD)
+# ENTRYPOINT ensures the application starts immediately when the container launches.
 ENTRYPOINT ["java", "-jar", "app.jar"]

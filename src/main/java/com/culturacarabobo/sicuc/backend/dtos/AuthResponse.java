@@ -1,21 +1,44 @@
 package com.culturacarabobo.sicuc.backend.dtos;
 
-public class AuthResponse {
-    private String accessToken;
-    private String refreshToken; // <-- Campo añadido
+/**
+ * Data Transfer Object (DTO) for sending authentication tokens back to the
+ * client.
+ * <p>
+ * This immutable class models the JSON response body sent after a successful
+ * login or token refresh.
+ */
+public final class AuthResponse {
 
-    // Constructor actualizado para aceptar ambos tokens
+    /**
+     * The short-lived JSON Web Token (JWT) used for authenticating API requests.
+     */
+    private final String accessToken;
+
+    /**
+     * The long-lived JSON Web Token (JWT) used to request a new access token
+     * when the old one expires.
+     */
+    private final String refreshToken;
+
+    /**
+     * Constructs a new authentication response.
+     *
+     * @param accessToken  The generated access token.
+     * @param refreshToken The generated refresh token.
+     */
     public AuthResponse(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
 
-    // Getters para ambos campos
-    public String getAccessToken() { 
-        return accessToken; 
+    // --- Standard Getters ---
+    // (No setters are provided, as this is an immutable DTO)
+
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public String getRefreshToken() { 
-        return refreshToken; 
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }

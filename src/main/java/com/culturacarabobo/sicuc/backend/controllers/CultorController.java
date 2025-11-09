@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 /**
- * REST controller to manage Cultor entities.
- * Supports filtering and creation of cultors via HTTP endpoints.
+ * REST controller that exposes endpoints for the Cultor entity CRUD operations.
+ * <p>
+ * Delegates all business logic to {@link CultorService}.
  */
 @RestController
 @RequestMapping("/cultors")
@@ -31,19 +32,29 @@ public class CultorController {
     private final CultorService cultorService;
 
     /**
-     * Constructor for dependency injection of the CultorService.
-     * 
-     * @param cultorService Service that handles business logic for cultors.
+     * Constructs the controller with the required CultorService.
+     *
+     * @param cultorService The service responsible for cultor business logic.
      */
     public CultorController(CultorService cultorService) {
         this.cultorService = cultorService;
     }
 
     /**
-     * GET endpoint to retrieve a *paginated* list of cultors filtered by optional parameters.
-     * ... (el resto de tu Javadoc) ...
-     * @param pageable        Spring inyectará automáticamente los parámetros page, size y sort.
-     * @return Page<CultorResponse> DTOs matching the filters.
+     * [GET /cultors] Retrieves a paginated and filtered list of cultors.
+     * <p>
+     * Supports dynamic filtering by multiple criteria and provides paginated results.
+     *
+     * @param query           Optional search term for name, ID number, or phone.
+     * @param gender          Optional filter for gender ("M" or "F").
+     * @param municipalityId  Optional filter by municipality ID.
+     * @param parishId        Optional filter by parish ID.
+     * @param artCategoryId   Optional filter by art category ID.
+     * @param artDisciplineId Optional filter by art discipline ID.
+     * @param hasDisability   Optional filter for disability status (true/false).
+     * @param hasIllness      Optional filter for illness status (true/false).
+     * @param pageable        Automatic Spring parameter for pagination (e.g., ?page=0&size=10&sort=lastName,asc).
+     * @return A {@link Page} of {@link CultorResponse} DTOs matching the filters.
      */
     @SuppressWarnings("null")
     @GetMapping
@@ -56,20 +67,35 @@ public class CultorController {
             @RequestParam(required = false) Integer artDisciplineId,
             @RequestParam(required = false) Boolean hasDisability,
             @RequestParam(required = false) Boolean hasIllness,
-            Pageable pageable) { // <-- AÑADIDO (Spring lo maneja solo)
+            Pageable pageable) {
 
         return cultorService.getAllCultorsWithFilters(query,
                 gender, municipalityId, parishId, artCategoryId, artDisciplineId, hasDisability, hasIllness,
-                pageable); // <-- SE LO PASAMOS AL SERVICIO
+                pageable);
     }
 
     /**
-     * POST endpoint to create a new cultor.
-     * Validates the request body before passing it to the service layer.
-     * 
-     * @param cultorRequest DTO containing the data to create a cultor.
-     * @return ResponseEntity with the created CultorResponse and appropriate HTTP
-     *         status.
+     * [GET /cultors/{id}] Retrieves a single cultor by its ID.
+     *
+     * @param id The ID (primary key) of the cultor to retrieve.
+     * @return A {@link ResponseEntity} with the {@link CultorResponse} and HTTP status 200 (OK).
+     * @throws jakarta.persistence.EntityNotFoundException If the ID is not found (handled by GlobalExceptionHandler as 404).
+     */
+    @SuppressWarnings("null")
+    @GetMapping("/{id}")
+    public ResponseEntity<CultorResponse> getById(@PathVariable Integer id) {
+        return cultorService.getById(id);
+    }
+
+    /**
+     * [POST /cultors] Creates a new cultor.
+     * <p>
+     * Validates the incoming {@link CultorRequest} body.
+     *
+     * @param cultorRequest The DTO containing the data for the new cultor. Must be valid.
+     * @return A {@link ResponseEntity} with the created {@link CultorResponse} and HTTP status 201 (Created).
+     * @throws org.springframework.web.bind.MethodArgumentNotValidException If DTO validation fails (handled by GlobalExceptionHandler as 400).
+     * @throws com.culturacarabobo.sicuc.backend.exceptions.DuplicateEntityException If a unique constraint (idNumber, phone, etc.) is violated (handled by GlobalExceptionHandler as 409).
      */
     @SuppressWarnings("null")
     @PostMapping
@@ -78,12 +104,18 @@ public class CultorController {
     }
 
     /**
-     * NUEVO ENDPOINT:
-     * PUT endpoint para actualizar un cultor existente por su ID.
+     * [PUT /cultors/{id}] Updates an existing cultor by its ID.
+     * <p>
+     * Validates the incoming {@link CultorRequest} body and checks business rules
+     * (e.g., immutable fields, unique constraints).
      *
-     * @param id            El ID del cultor a actualizar (viene de la URL).
-     * @param cultorRequest DTO con los datos para actualizar.
-     * @return ResponseEntity con el CultorResponse actualizado.
+     * @param id            The ID of the cultor to update.
+     * @param cultorRequest The DTO with the updated data. Must be valid.
+     * @return A {@link ResponseEntity} with the updated {@link CultorResponse} and HTTP status 200 (OK).
+     * @throws jakarta.persistence.EntityNotFoundException If the ID is not found (returns 404).
+     * @throws org.springframework.web.bind.MethodArgumentNotValidException If DTO validation fails (returns 400).
+     * @throws com.culturacarabobo.sicuc.backend.exceptions.DuplicateEntityException If a unique field (e.g., phone) conflicts with another cultor (returns 409).
+     * @throws java.lang.IllegalArgumentException If an immutable field (e.g., idNumber) is changed (returns 400).
      */
     @SuppressWarnings("null")
     @PutMapping("/{id}")
@@ -95,27 +127,15 @@ public class CultorController {
     }
 
     /**
-     * DELETE endpoint para eliminar un cultor por su ID.
+     * [DELETE /cultors/{id}] Deletes a cultor by its ID.
      *
-     * @param id El ID del cultor a eliminar (viene de la URL).
-     * @return ResponseEntity con el status apropiado (204 o 404).
+     * @param id The ID of the cultor to delete.
+     * @return A {@link ResponseEntity} with HTTP status 204 (No Content).
+     * @throws jakarta.persistence.EntityNotFoundException If the ID is not found (returns 404).
      */
     @SuppressWarnings("null")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         return cultorService.delete(id);
     }
-
-    /**
-     * GET endpoint para obtener un cultor por su ID.
-     *
-     * @param id El ID del cultor a obtener (viene de la URL).
-     * @return ResponseEntity con el CultorResponse y status 200 o 404.
-     */
-    @SuppressWarnings("null")
-    @GetMapping("/{id}")
-    public ResponseEntity<CultorResponse> getById(@PathVariable Integer id) {
-        return cultorService.getById(id);
-    }
-
 }

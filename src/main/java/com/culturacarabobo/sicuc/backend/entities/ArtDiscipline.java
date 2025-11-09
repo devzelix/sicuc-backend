@@ -5,27 +5,48 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint; // Import for Javadoc
 
-@Entity // Marks this class as a JPA entity
+/**
+ * Represents an Art Discipline entity (e.g., "Guitarra", "Pintura al Óleo").
+ * <p>
+ * This entity maps to the {@code art_disciplines} table. Each discipline
+ * must be associated with a parent {@link ArtCategory}.
+ * <p>
+ * A {@link UniqueConstraint} ensures that a discipline name is unique
+ * *within* its specific art category (e.g., "Canto" can exist in "Música"
+ * but not twice).
+ */
+@Entity
 @Table(name = "art_disciplines", uniqueConstraints = {
-        @jakarta.persistence.UniqueConstraint(columnNames = { "name", "art_category_id" })
-}) // Ensures discipline names are unique within their category
+        @UniqueConstraint(columnNames = { "name", "art_category_id" })
+})
 public class ArtDiscipline {
 
+    /**
+     * The unique identifier (primary key) for the art discipline.
+     * Auto-incremented by the database.
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generated primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(length = 100, nullable = false) // Discipline name with max length and not-null constraint
+    /**
+     * The name of the art discipline (e.g., "Guitarra"). Required.
+     */
+    @Column(length = 100, nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many disciplines can belong to one category; lazily loaded
-    @JoinColumn(name = "art_category_id", nullable = false) // Foreign key to ArtCategory, not nullable
+    /**
+     * The parent {@link ArtCategory} this discipline belongs to.
+     * This is a many-to-one relationship (e.g., many disciplines -> one category).
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "art_category_id", nullable = false)
     private ArtCategory artCategory;
 
     /**
@@ -35,17 +56,18 @@ public class ArtDiscipline {
     }
 
     /**
-     * Constructor to create an ArtDiscipline with a name and category.
+     * Convenience constructor to create a new ArtDiscipline with a name and
+     * parent category.
      *
-     * @param name        the name of the discipline
-     * @param artCategory the associated art category
+     * @param name        The name of the discipline.
+     * @param artCategory The associated {@link ArtCategory}.
      */
     public ArtDiscipline(String name, ArtCategory artCategory) {
         this.name = name;
         this.artCategory = artCategory;
     }
 
-    // Getters and setters
+    // --- Standard Getters and Setters ---
 
     public int getId() {
         return id;
@@ -70,5 +92,4 @@ public class ArtDiscipline {
     public void setArtCategory(ArtCategory artCategory) {
         this.artCategory = artCategory;
     }
-
 }

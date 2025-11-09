@@ -1,53 +1,81 @@
+# ===================================================================
+# == DOCKER COMPOSE CONFIGURATION (Development Environment)
+# ===================================================================
+
+# This file orchestrates the multi-container environment for local development
+# and automated testing, ensuring consistency and rapid iteration.
 services:
-  # 🟦 Backend SICUC
+  # 🟦 Backend SICUC (The Spring Boot Application)
   sicuc-backend:
     build:
       context: .
       dockerfile: Dockerfile
-      # 🔑 CORRECCIÓN: Indica usar la etapa 'builder' para desarrollo.
+      # IMPORTANT: Use the 'builder' stage for development. This allows the IDE 
+      # (VS Code) to attach for debugging and rapid compilation.
       target: builder 
     image: sicuc-backend-image:latest
     container_name: sicuc-backend
+    
+    # TTY/stdin: Enables interactive sessions for Dev Container debugging.
     tty: true
     stdin_open: true
     working_dir: /app
+    
+    # Volume mapping for host-container synchronization and cache persistence
     volumes:
+      # Mounts the local project source code for live editing/compilation
       - .:/app
+      # Caches the Maven repository locally for faster dependency resolution
       - ~/.m2:/root/.m2
+    
+    # IMPORTANT: Ensures the database is fully initialized and ready before the backend starts
     depends_on:
       sicuc-db:
         condition: service_healthy
+    
     ports:
       - "8080:8080"
+      
     command: sh
     networks:
       - sicuc-app-network
 
-  # 🟨 Base de datos MySQL
+  # 🟨 Base de datos MySQL (Development Data Store)
   sicuc-db:
     image: mysql:8.0
     container_name: sicuc-db
     restart: unless-stopped
+    
+    # Injects environment variables (secrets/config) from the local .env file
     env_file: .env
+    
+    # Maps critical secrets/configurations from .env to MySQL variables
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD_SECRET}
       MYSQL_DATABASE: ${SPRING_DATASOURCE_DATABASE}
       MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
       MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      
+    # Persists database data locally
     volumes:
       - db_data:/var/lib/mysql
+      
+    # Healthcheck ensures the database is accepting TCP connections
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD_SECRET"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 30s # Wait 30 seconds for MySQL to initialize
+      
     networks:
       - sicuc-app-network
 
+# Define persistent storage volumes for database data
 volumes:
   db_data:
 
+# Define a custom network to allow containers to communicate privately
 networks:
   sicuc-app-network:
     name: sicuc-internal-network

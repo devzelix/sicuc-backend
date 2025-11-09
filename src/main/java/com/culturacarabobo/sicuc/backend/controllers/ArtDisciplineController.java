@@ -10,8 +10,11 @@ import com.culturacarabobo.sicuc.backend.services.ArtDisciplineService;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * REST controller to handle HTTP requests related to Art Disciplines.
- * Provides endpoints to retrieve art discipline data.
+ * REST controller for exposing read-only endpoints related to Art Disciplines.
+ * <p>
+ * This controller is primarily used to provide data for frontend form
+ * dropdowns.
+ * It delegates all logic to {@link ArtDisciplineService}.
  */
 @RestController
 @RequestMapping("/art-disciplines")
@@ -20,19 +23,21 @@ public class ArtDisciplineController {
     private final ArtDisciplineService artDisciplineService;
 
     /**
-     * Constructor to inject the ArtDisciplineService dependency.
-     * 
-     * @param artDisciplineService service layer for art discipline operations
+     * Constructs the controller with the required ArtDisciplineService.
+     *
+     * @param artDisciplineService The service responsible for art discipline
+     * business logic.
      */
     public ArtDisciplineController(ArtDisciplineService artDisciplineService) {
         this.artDisciplineService = artDisciplineService;
     }
 
     /**
-     * GET endpoint to retrieve a list of all art disciplines.
-     * 
-     * @return list of ArtDisciplineResponse DTOs containing art discipline
-     *         information
+     * [GET /art-disciplines] Retrieves a list of all art disciplines.
+     * <p>
+     * This endpoint is public and used to populate selection fields.
+     *
+     * @return A {@link List} of {@link ArtDisciplineResponse} DTOs, sorted by ID.
      */
     @GetMapping
     public List<ArtDisciplineResponse> getAll() {

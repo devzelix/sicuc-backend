@@ -1,10 +1,31 @@
-HELP.md
+# ===================================================================
+# == GIT IGNORE CONFIGURATION
+# ===================================================================
+
+# This file tells Git which files and folders to ignore to keep the repository
+# clean and prevent sensitive or large build artifacts from being committed.
+
+# -------------------------------------------------------------------
+# 1. BUILD ARTIFACTS (MAVEN, GRADLE)
+# -------------------------------------------------------------------
+# Ignore Maven build output directories
 target/
+build/
+
+# Exception: Maven Wrapper JAR must be kept so others can build the project
+# without installing Maven.
 !.mvn/wrapper/maven-wrapper.jar
+
+# Additional exclusion patterns for nested module/project structures
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+# -------------------------------------------------------------------
 
-### STS ###
+# 2. IDE METADATA (DO NOT COMMIT)
+# ------------------------------------
+### STS / Eclipse ###
 .apt_generated
 .classpath
 .factorypath
@@ -25,14 +46,20 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
 
-### Others ###
+# -------------------------------------------------------------------
+# 3. SENSITIVE & RUNTIME DATA
+# -------------------------------------------------------------------
+
+# CRITICAL: Ignore environment variable files and temporary database folders.
+# This prevents credentials, secrets, and local paths from being committed.
 .env
 mysql/
-data.sql
+/backups/
+*.sql
+
+# Ignore auto-generated files (like default documentation)
+HELP.md

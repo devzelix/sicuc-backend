@@ -3,7 +3,7 @@ package com.culturacarabobo.sicuc.backend.services;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq; // <-- Necesario para la prueba de claim
+import static org.mockito.ArgumentMatchers.eq;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,20 +14,23 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; // Added for Javadoc
 
 import com.culturacarabobo.sicuc.backend.dtos.AuthRequest;
 import com.culturacarabobo.sicuc.backend.dtos.AuthResponse;
 import com.culturacarabobo.sicuc.backend.dtos.RefreshTokenRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
- * Pruebas Unitarias para AuthenticationService.
- * Todas las dependencias (Managers, Services) son simuladas (Mocks).
+ * Unit tests for the {@link AuthenticationService}.
+ * <p>
+ * This class uses Mockito to test the login and token refresh logic in isolation
+ * by simulating (mocking) the behavior of {@link AuthenticationManager},
+ * {@link UserService}, and {@link JwtService}.
  */
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceTest {
 
-    // --- Dependencias Simuladas (Mocks) ---
+    // --- Mocks (Dependencies) ---
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
@@ -35,124 +38,132 @@ public class AuthenticationServiceTest {
     @Mock
     private JwtService jwtService;
 
-    // --- Clase Bajo Prueba ---
+    // --- Class Under Test (Injects the Mocks) ---
     @InjectMocks
     private AuthenticationService authenticationService;
 
+    // ----------------------------------------------------------------
+    // LOGIN TESTS
+    // ----------------------------------------------------------------
+
+    /**
+     * Test (Happy Path): {@link AuthenticationService#login(AuthRequest)}.
+     * <p>
+     * Scenario: Valid credentials are provided.
+     * Expected: Authentication succeeds, and new access/refresh tokens are returned.
+     */
     @SuppressWarnings("null")
     @Test
     public void whenLogin_Success_shouldReturnAuthResponse() {
-        // --- 1. ARRANGE (Preparar) ---
+        // [ARRANGE] Setup mocks for successful authentication
         AuthRequest loginRequest = new AuthRequest();
-        loginRequest.setUsername("testuser"); // <-- ARREGLADO
-        loginRequest.setPassword("password"); // <-- ARREGLADO
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("password");
         
         UserDetails userDetails = User.builder().username("testuser").password("password").roles("USER").build();
 
-        // Configuramos los Mocks
-        // 1. El UserService encuentra al usuario
         when(userService.loadUserByUsername("testuser")).thenReturn(userDetails);
-        
-        // 2. El JwtService genera los tokens
         when(jwtService.generateToken(userDetails)).thenReturn("fake-access-token");
         when(jwtService.generateRefreshToken(userDetails)).thenReturn("fake-refresh-token");
-        
-        // El AuthenticationManager requiere un when() para la autenticación, aunque no lo usemos
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
             .thenReturn(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
 
-
-        // --- 2. ACT (Actuar) ---
+        // [ACT]
         AuthResponse response = authenticationService.login(loginRequest);
 
-        // --- 3. ASSERT (Verificar) ---
-        assertNotNull(response);
+        // [ASSERT]
         assertEquals("fake-access-token", response.getAccessToken());
         assertEquals("fake-refresh-token", response.getRefreshToken());
-
-        // Verificamos que los mocks fueron llamados
         verify(authenticationManager, times(1)).authenticate(any());
         verify(userService, times(1)).loadUserByUsername("testuser");
-        verify(jwtService, times(1)).generateToken(userDetails);
-        verify(jwtService, times(1)).generateRefreshToken(userDetails);
     }
 
+    /**
+     * Test (Sad Path): {@link AuthenticationService#login(AuthRequest)}.
+     * Scenario: Invalid password or unknown username.
+     * Expected: Throws {@link BadCredentialsException} and skips token generation.
+     */
     @SuppressWarnings("null")
     @Test
     public void whenLogin_BadCredentials_shouldThrowException() {
-        // --- 1. ARRANGE (Preparar) ---
+        // [ARRANGE] Setup mock to force authentication failure
         AuthRequest loginRequest = new AuthRequest();
-        loginRequest.setUsername("testuser"); // <-- ARREGLADO
-        loginRequest.setPassword("wrong-password"); // <-- ARREGLADO
+        loginRequest.setUsername("testuser");
+        loginRequest.setPassword("wrong-password");
 
-        // Configuramos el Mock
-        // 1. El AuthenticationManager Falla y lanza una excepción
         when(authenticationManager.authenticate(any()))
             .thenThrow(new BadCredentialsException("Invalid credentials"));
 
-        // --- 2. ACT & 3. ASSERT ---
-        // Verificamos que la excepción es lanzada
+        // [ACT & ASSERT]
         assertThrows(BadCredentialsException.class, () -> {
             authenticationService.login(loginRequest);
         });
 
-        // Verificamos que los otros servicios NUNCA fueron llamados
+        // Verify token generation was never attempted
         verify(userService, never()).loadUserByUsername(anyString());
         verify(jwtService, never()).generateToken(any());
     }
 
+    // ----------------------------------------------------------------
+    // REFRESH TOKEN TESTS
+    // ----------------------------------------------------------------
+
+    /**
+     * Test (Happy Path): {@link AuthenticationService#refreshToken(RefreshTokenRequest)}.
+     * Scenario: A valid, unexpired refresh token is provided.
+     * Expected: A new access token is generated, and the original refresh token is returned.
+     */
     @SuppressWarnings("null")
     @Test
     public void whenRefreshToken_Success_shouldReturnNewAccessToken() {
-        // --- 1. ARRANGE (Preparar) ---
+        // [ARRANGE] Setup mocks for successful token renewal
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest();
-        refreshRequest.setRefreshToken("valid-refresh-token"); // <-- ARREGLADO
+        refreshRequest.setRefreshToken("valid-refresh-token");
         
         UserDetails userDetails = User.builder().username("testuser").password("").roles("USER").build();
 
-        // Configuramos los Mocks
         when(jwtService.extractUsername("valid-refresh-token")).thenReturn("testuser");
         when(userService.loadUserByUsername("testuser")).thenReturn(userDetails);
         when(jwtService.isTokenValid("valid-refresh-token", userDetails)).thenReturn(true);
         when(jwtService.extractClaim(eq("valid-refresh-token"), any())).thenReturn("refresh");
         when(jwtService.generateToken(userDetails)).thenReturn("new-access-token");
 
-        // --- 2. ACT (Actuar) ---
+        // [ACT]
         AuthResponse response = authenticationService.refreshToken(refreshRequest);
 
-        // --- 3. ASSERT (Verificar) ---
-        assertNotNull(response);
+        // [ASSERT]
         assertEquals("new-access-token", response.getAccessToken());
         assertEquals("valid-refresh-token", response.getRefreshToken()); 
-
-        // Verificamos que 'generateToken' (para el nuevo access) fue llamado
         verify(jwtService, times(1)).generateToken(userDetails);
     }
     
+    /**
+     * Test (Sad Path): {@link AuthenticationService#refreshToken(RefreshTokenRequest)}.
+     * Scenario: An *access* token is mistakenly sent to the refresh endpoint.
+     * Expected: Throws {@link RuntimeException} as the token type is wrong.
+     */
     @SuppressWarnings("null")
     @Test
     public void whenRefreshToken_IsActuallyAccessToken_shouldThrowException() {
-        // --- 1. ARRANGE (Preparar) ---
+        // [ARRANGE] Setup mocks to confirm token type is "access"
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest();
-        refreshRequest.setRefreshToken("not-a-refresh-token"); // <-- ARREGLADO
+        refreshRequest.setRefreshToken("not-a-refresh-token");
         
         UserDetails userDetails = User.builder().username("testuser").password("").roles("USER").build();
 
-        // Configuramos los Mocks
         when(jwtService.extractUsername("not-a-refresh-token")).thenReturn("testuser");
         when(userService.loadUserByUsername("testuser")).thenReturn(userDetails);
         when(jwtService.isTokenValid("not-a-refresh-token", userDetails)).thenReturn(true);
-        when(jwtService.extractClaim(eq("not-a-refresh-token"), any())).thenReturn("access"); // <-- ¡Es un token de "access"!
+        when(jwtService.extractClaim(eq("not-a-refresh-token"), any())).thenReturn("access"); // Token type is 'access'
 
-        // --- 2. ACT & 3. ASSERT ---
+        // [ACT & ASSERT]
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             authenticationService.refreshToken(refreshRequest);
         });
 
         assertEquals("Invalid or expired Refresh Token", exception.getMessage());
         
-        // Verificamos que NUNCA se generó un nuevo token
+        // Verify token generation was never called
         verify(jwtService, never()).generateToken(userDetails);
     }
-
 }

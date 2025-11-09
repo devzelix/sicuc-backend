@@ -10,8 +10,11 @@ import com.culturacarabobo.sicuc.backend.services.ArtCategoryService;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * REST controller responsible for handling requests related to art categories.
- * Exposes endpoints to retrieve art category data.
+ * REST controller for exposing read-only endpoints related to Art Categories.
+ * <p>
+ * This controller is primarily used to provide data for frontend form
+ * dropdowns.
+ * It delegates all logic to {@link ArtCategoryService}.
  */
 @RestController
 @RequestMapping("/art-categories")
@@ -20,18 +23,21 @@ public class ArtCategoryController {
     private final ArtCategoryService artCategoryService;
 
     /**
-     * Constructor for dependency injection of ArtCategoryService.
+     * Constructs the controller with the required ArtCategoryService.
      *
-     * @param artCategoryService service to manage art category data
+     * @param artCategoryService The service responsible for art category business
+     * logic.
      */
     public ArtCategoryController(ArtCategoryService artCategoryService) {
         this.artCategoryService = artCategoryService;
     }
 
     /**
-     * Handles GET requests to retrieve all art categories.
+     * [GET /art-categories] Retrieves a list of all art categories.
+     * <p>
+     * This endpoint is public and used to populate selection fields.
      *
-     * @return list of ArtCategoryResponse DTOs containing art category information
+     * @return A {@link List} of {@link ArtCategoryResponse} DTOs, sorted by ID.
      */
     @GetMapping
     public List<ArtCategoryResponse> getAll() {

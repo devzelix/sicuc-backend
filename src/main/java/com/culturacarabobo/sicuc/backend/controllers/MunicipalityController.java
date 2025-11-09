@@ -10,8 +10,11 @@ import com.culturacarabobo.sicuc.backend.services.MunicipalityService;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * REST controller to manage municipality-related endpoints.
- * Provides access to municipality data through HTTP requests.
+ * REST controller for exposing read-only endpoints related to Municipalities.
+ * <p>
+ * This controller is primarily used to provide data for frontend form
+ * dropdowns.
+ * It delegates all logic to {@link MunicipalityService}.
  */
 @RestController
 @RequestMapping("/municipalities")
@@ -20,18 +23,21 @@ public class MunicipalityController {
     private final MunicipalityService municipalityService;
 
     /**
-     * Constructor-based dependency injection for MunicipalityService.
+     * Constructs the controller with the required MunicipalityService.
      *
-     * @param municipalityService service that handles municipality data operations
+     * @param municipalityService The service responsible for municipality
+     * business logic.
      */
     public MunicipalityController(MunicipalityService municipalityService) {
         this.municipalityService = municipalityService;
     }
 
     /**
-     * Handles HTTP GET requests for retrieving all municipalities.
+     * [GET /municipalities] Retrieves a list of all municipalities.
+     * <p>
+     * This endpoint is public and used to populate selection fields.
      *
-     * @return a list of MunicipalityResponse DTOs representing all municipalities
+     * @return A {@link List} of {@link MunicipalityResponse} DTOs, sorted by ID.
      */
     @GetMapping
     public List<MunicipalityResponse> getAll() {

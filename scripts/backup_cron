@@ -1,0 +1,9 @@
+# ============================================================
+# SICUC Database Backup Cron Job
+# ------------------------------------------------------------
+# This cron job runs the backup_db.sh script daily at 2:00 AM.
+# Output and errors are logged in LOG_DIR defined in the script.
+# ============================================================
+
+# Minute Hour DayOfMonth Month DayOfWeek Command
+0 2 * * * /app/backup_db.sh >> /var/log/sicuc_backups/backup_cron.log 2>&1

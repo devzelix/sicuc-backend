@@ -3,24 +3,40 @@ package com.culturacarabobo.sicuc.backend.exceptions;
 import java.time.Instant;
 
 /**
- * Represents a standardized structure for error responses
- * sent by the API, containing timestamp, HTTP status code,
- * error message, and the request path.
+ * Represents a standardized, immutable error response body sent by the API.
+ * <p>
+ * This DTO is used by the {@link GlobalExceptionHandler} to ensure all
+ * client-facing errors (4xx, 5xx) have a consistent JSON structure.
  */
-public class ErrorResponse {
-
-    private Instant timestamp;
-    private int status;
-    private String error;
-    private String path;
+public final class ErrorResponse {
 
     /**
-     * Constructs an ErrorResponse with the specified details.
+     * The exact time the error occurred.
+     */
+    private final Instant timestamp;
+
+    /**
+     * The HTTP status code (e.g., 404, 400, 500).
+     */
+    private final int status;
+
+    /**
+     * A descriptive error message explaining what went wrong.
+     */
+    private final String error;
+
+    /**
+     * The API endpoint path where the error occurred (e.g., "/cultors/99").
+     */
+    private final String path;
+
+    /**
+     * Constructs a new, immutable ErrorResponse.
      *
-     * @param timestamp the time the error occurred
-     * @param status    the HTTP status code
-     * @param error     a descriptive error message
-     * @param path      the API endpoint path where the error occurred
+     * @param timestamp The time the error occurred.
+     * @param status    The HTTP status code.
+     * @param error     A descriptive error message.
+     * @param path      The API endpoint path where the error occurred.
      */
     public ErrorResponse(Instant timestamp, int status, String error, String path) {
         this.timestamp = timestamp;
@@ -29,38 +45,22 @@ public class ErrorResponse {
         this.path = path;
     }
 
-    // Getters and setters
+    // --- Standard Getters ---
+    // (No setters are provided, as this is an immutable DTO)
 
     public Instant getTimestamp() {
         return timestamp;
-    }
-
-    public void setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
     }
 
     public int getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public String getError() {
         return error;
-    }
-
-    public void setError(String error) {
-        this.error = error;
     }
 
     public String getPath() {
         return path;
     }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
 }

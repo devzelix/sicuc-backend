@@ -1,23 +1,27 @@
 package com.culturacarabobo.sicuc.backend.entities;
 
 /**
- * Defines the standard, professional roles a user can have within the system.
+ * Defines the user roles within the application.
+ * <p>
+ * These roles are used by Spring Security to handle authorization.
+ * The "ROLE_" prefix is a standard convention for Spring Security.
  */
 public enum Role {
-    
+
     /**
-     * Grants full administrative privileges over the entire system.
+     * Full administrative privileges. Can manage users and system settings.
      */
     ROLE_ADMIN,
 
     /**
-     * Allows a staff member to create, read, update, and delete cultural data.
-     * Does not grant access to system configuration or other user management.
+     * Standard staff member. Can create, read, update, and delete cultor data.
+     * Cannot manage users or system configuration.
      */
     ROLE_EDITOR,
 
     /**
-     * The standard role for a registered artist/cultural practitioner.
+     * The default role for a registered artist or cultural practitioner.
+     * (Currently used as a base role, can be expanded later).
      */
-    ROLE_ARTIST
+    ROLE_CULTOR
 }

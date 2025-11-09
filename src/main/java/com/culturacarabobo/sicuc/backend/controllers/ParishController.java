@@ -10,8 +10,11 @@ import com.culturacarabobo.sicuc.backend.services.ParishService;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
- * REST controller to manage parish-related endpoints.
- * Provides access to parish data via HTTP requests.
+ * REST controller for exposing read-only endpoints related to Parishes.
+ * <p>
+ * This controller is primarily used to provide data for frontend form
+ * dropdowns.
+ * It delegates all logic to {@link ParishService}.
  */
 @RestController
 @RequestMapping("/parishes")
@@ -20,18 +23,20 @@ public class ParishController {
     private final ParishService parishService;
 
     /**
-     * Constructor-based dependency injection for ParishService.
+     * Constructs the controller with the required ParishService.
      *
-     * @param parishService service handling parish data operations
+     * @param parishService The service responsible for parish business logic.
      */
     public ParishController(ParishService parishService) {
         this.parishService = parishService;
     }
 
     /**
-     * Handles HTTP GET requests for retrieving all parishes.
+     * [GET /parishes] Retrieves a list of all parishes.
+     * <p>
+     * This endpoint is public and used to populate selection fields.
      *
-     * @return a list of ParishResponse DTOs representing all parishes
+     * @return A {@link List} of {@link ParishResponse} DTOs, sorted by ID.
      */
     @GetMapping
     public List<ParishResponse> getAll() {
