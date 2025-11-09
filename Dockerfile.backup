@@ -1,0 +1,42 @@
+# ============================================================
+# SICUC Database Backup Container
+# ------------------------------------------------------------
+# Lightweight container to perform scheduled MySQL backups.
+# Author: devzelix
+# Last Updated: 2025-11-09
+# ============================================================
+
+# Base image: lightweight Alpine Linux
+FROM alpine:3.20
+
+# Install necessary packages: bash, mysql-client, gzip, and cron
+RUN apk add --no-cache bash mysql-client gzip tzdata curl
+
+# Set working directory
+WORKDIR /app
+
+# Copy backup script and cron file into the container
+COPY scripts/backup_db.sh /app/backup_db.sh
+COPY scripts/backup_cron /etc/cron.d/backup_cron
+
+# Make scripts executable
+RUN chmod +x /app/backup_db.sh \
+    && chmod 644 /etc/cron.d/backup_cron
+
+# Apply cron job
+RUN crontab /etc/cron.d/backup_cron
+
+# Create directories for backups and logs
+RUN mkdir -p /backups /var/log/sicuc_backups
+
+# Set environment variables (can be overridden by docker-compose)
+ENV CONTAINER_NAME=sicuc-db \
+    DATABASE_NAME=sicuc_db \
+    ROOT_PASSWORD=secret \
+    BACKUP_DIR=/backups \
+    LOG_DIR=/var/log/sicuc_backups \
+    RETENTION_DAYS=7 \
+    EMAIL_ON_ERROR=""
+
+# Start cron in foreground (for Docker)
+CMD ["crond", "-f", "-L", "/var/log/cron.log"]

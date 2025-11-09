@@ -30,11 +30,13 @@ import com.culturacarabobo.sicuc.backend.utils.StringUtils;
 import com.culturacarabobo.sicuc.backend.utils.StringValidator;
 
 /**
- * Service class for managing cultor-related operations.
+ * Service layer responsible for all business logic related to {@link Cultor} entities.
+ * This includes creation, validation, updates, deletion, and querying.
  */
 @Service
 public class CultorService {
 
+    // Repositories are declared 'final' and injected via the constructor
     private final CultorRepository cultorRepository;
     private final MunicipalityRepository municipalityRepository;
     private final ParishRepository parishRepository;
@@ -42,7 +44,14 @@ public class CultorService {
     private final ArtDisciplineRepository artDisciplineRepository;
 
     /**
-     * Constructor with dependency injection for all repositories used.
+     * Constructs the service and injects all required repositories.
+     * Spring automatically provides these dependencies.
+     *
+     * @param cultorRepository        Repository for {@link Cultor} data access.
+     * @param municipalityRepository  Repository for {@link Municipality} data access.
+     * @param parishRepository        Repository for {@link Parish} data access.
+     * @param artCategoryRepository   Repository for {@link ArtCategory} data access.
+     * @param artDisciplineRepository Repository for {@link ArtDiscipline} data access.
      */
     public CultorService(CultorRepository cultorRepository, MunicipalityRepository municipalityRepository,
             ParishRepository parishRepository, ArtCategoryRepository artCategoryRepository,
@@ -55,78 +64,78 @@ public class CultorService {
     }
 
     /**
-     * Creates a new Cultor entity after validating uniqueness of key fields.
-     * 
-     * @param cultorRequest DTO containing data for the new cultor.
-     * @return ResponseEntity with the created CultorResponse DTO.
-     * @throws DuplicateEntityException if a cultor with the same ID, phone, email
-     *                                  or Instagram username exists.
-     * @throws IllegalArgumentException if data validation fails.
+     * Creates a new Cultor after performing extensive validation.
+     *
+     * @param cultorRequest The DTO containing the data for the new cultor.
+     * @return A {@link ResponseEntity} with the created {@link CultorResponse} and HTTP 201 (Created).
+     * @throws DuplicateEntityException If idNumber, phoneNumber, email, or instagramUser already exist.
+     * @throws EntityNotFoundException  If related entities (Municipality, Parish, etc.) are not found.
+     * @throws IllegalArgumentException If business rules (e.g., validations, relationships) fail.
      */
     @SuppressWarnings("null")
     public ResponseEntity<CultorResponse> create(CultorRequest cultorRequest) {
-        // Check if any unique fields already exist in the database
+        // 1. Perform preliminary uniqueness checks
         if (cultorRepository.existsByIdNumber(cultorRequest.getIdNumber()))
             throw new DuplicateEntityException("Id Number Already Exists");
         if (cultorRepository.existsByPhoneNumber(cultorRequest.getPhoneNumber()))
             throw new DuplicateEntityException("Phone Number Already Exists");
 
-        // Validate and normalize Email if provided
+        // 2. Uniqueness check for optional email
         String email = cultorRequest.getEmail();
         if (email != null && !email.trim().isEmpty()) {
             email = email.toLowerCase();
-            if (cultorRepository.existsByEmail(cultorRequest.getEmail()))
+            if (cultorRepository.existsByEmail(email)) // Use normalized email
                 throw new DuplicateEntityException("Email Already Exists");
         }
 
-        // Validate and normalize Instagram username if provided
+        // 3. Uniqueness check for optional instagramUser
         String instagramUser = cultorRequest.getInstagramUser();
         if (instagramUser != null && !instagramUser.trim().isEmpty()) {
             instagramUser = instagramUser.toLowerCase();
-            if (cultorRepository.existsByInstagramUser(cultorRequest.getInstagramUser()))
+            if (cultorRepository.existsByInstagramUser(instagramUser)) // Use normalized user
                 throw new DuplicateEntityException("Instagram Username Already Exists");
         }
 
-        // Convert DTO to entity, validate fields, and save
+        // 4. Map DTO to Entity, performing all deep validations
         Cultor cultor = mapAndValidateCultor(new Cultor(), cultorRequest);
+        
+        // 5. Save the new entity
         Cultor saved = cultorRepository.save(cultor);
 
-        // --- INICIO DEL CAMBIO ---
-        // Creamos la URI para el nuevo recurso (ej. /cultors/5)
+        // 6. Build the 201 Created response
         URI location = URI.create("/cultors/" + saved.getId());
-
-        // Devolvemos 201 Created, con la URI en la cabecera 'Location'
         return ResponseEntity.created(location).body(toCultorResponse(saved));
-        // --- FIN DEL CAMBIO ---
     }
 
     /**
-     * NUEVO MÉTODO: Actualiza un Cultor existente.
+     * Updates an existing Cultor by its ID.
+     * <p>
+     * This method performs critical business rule validations:
+     * 1. Checks that the Cultor exists.
+     * 2. Verifies that immutable fields (idNumber, birthDate) have not been changed.
+     * 3. Checks for uniqueness conflicts (phoneNumber, email) against *other* cultores.
      *
-     * @param id            ID del cultor a actualizar.
-     * @param cultorRequest DTO con los nuevos datos.
-     * @return ResponseEntity con el CultorResponse actualizado.
-     * @throws EntityNotFoundException  si el cultor no se encuentra.
-     * @throws DuplicateEntityException si los nuevos datos únicos ya existen en otro cultor.
-     * @throws IllegalArgumentException si la validación de datos falla.
+     * @param id            The ID of the cultor to update.
+     * @param cultorRequest The DTO containing the new data.
+     * @return A {@link ResponseEntity} with the updated {@link CultorResponse} and HTTP 200 (OK).
+     * @throws EntityNotFoundException  If the cultor with the given ID is not found.
+     * @throws DuplicateEntityException If unique fields conflict with another existing cultor.
+     * @throws IllegalArgumentException If an immutable field is changed or business rules fail.
      */
     public ResponseEntity<CultorResponse> update(Integer id, CultorRequest cultorRequest) {
-        // 1. Buscar el cultor existente
+        // 1. Find the existing entity or throw 404
         Cultor cultorExisting = cultorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cultor Not Found With Id: " + id));
 
-        // 2. VALIDACIÓN DE INMUTABILIDAD (¡NUEVO!)
-        // Verificamos que la cédula en el request sea la misma que la guardada.
+        // 2. Enforce business rule: Immutable fields
         if (!cultorExisting.getIdNumber().equals(cultorRequest.getIdNumber())) {
             throw new IllegalArgumentException("The IdNumber (Cédula) cannot be modified.");
         }
-        
-        // Verificamos que la fecha de nacimiento sea la misma.
         if (!cultorExisting.getBirthDate().equals(cultorRequest.getBirthDate())) {
-             throw new IllegalArgumentException("The Birth Date cannot be modified.");
+            throw new IllegalArgumentException("The Birth Date cannot be modified.");
         }
 
-        // 3. Validar campos únicos (excluyendo al cultor actual)
+        // 3. Enforce business rule: Uniqueness checks for MUTABLE fields
         if (cultorRepository.existsByPhoneNumberAndIdNot(cultorRequest.getPhoneNumber(), id))
             throw new DuplicateEntityException("Phone Number Already Exists");
 
@@ -144,76 +153,115 @@ public class CultorService {
                 throw new DuplicateEntityException("Instagram Username Already Exists");
         }
 
-        // 3. Mapear y validar los datos del DTO a la entidad existente
-        // Usamos el método refactorizado
+        // 4. Map DTO data onto the existing entity, validating all fields
         mapAndValidateCultor(cultorExisting, cultorRequest);
 
-        // 4. Guardar los cambios
+        // 5. Save the updated entity
         Cultor saved = cultorRepository.save(cultorExisting);
 
-        // 5. Devolver la respuesta
+        // 6. Return 200 OK
         return ResponseEntity.ok(toCultorResponse(saved));
     }
 
     /**
-     * Retrieves a filtered list of CultorResponse objects based on given criteria.
-     * Uses specifications for dynamic query building.
-     * 
-     * @param query           Search keyword for names or other text fields.
-     * @param gender          Filter by gender ('F' or 'M').
-     * @param municipalityId  Filter by municipality.
-     * @param parishId        Filter by parish.
-     * @param artCategoryId   Filter by art category.
-     * @param artDisciplineId Filter by art discipline.
-     * @param hasDisability   Filter by disability presence.
-     * @param hasIllness      Filter by illness presence.
-     * @return List of CultorResponse DTOs matching filters.
+     * Retrieves a paginated list of cultors based on dynamic filter criteria.
+     * Uses {@link CultorSpecification} to build the query.
+     *
+     * @param query           (and all other params)...
+     * @param pageable        The pagination information (page, size, sort).
+     * @return A {@link Page} of {@link CultorResponse} DTOs.
      */
     public Page<CultorResponse> getAllCultorsWithFilters(String query, String gender, Integer municipalityId,
             Integer parishId,
             Integer artCategoryId, Integer artDisciplineId,
             Boolean hasDisability, Boolean hasIllness,
             Pageable pageable) {
+        
+        // 1. Build the dynamic query
         Specification<Cultor> specification = CultorSpecification.withFilters(query,
                 gender, municipalityId, parishId, artCategoryId, artDisciplineId, hasDisability,
                 hasIllness);
 
-        // 2. BUSCA USANDO EL REPOSITORIO CON LA ESPECIFICACIÓN Y EL PAGEABLE
-        // Esto ya no devuelve una List<Cultor>, sino un Page<Cultor>
+        // 2. Execute the paginated find
         Page<Cultor> cultorPage = cultorRepository.findAll(specification, pageable);
 
-        // 3. CONVIERTE EL CONTENIDO DE LA PÁGINA
-        // El método .map() de Page hace la conversión manteniendo la info de paginación
+        // 3. Convert the Page<Entity> to Page<DTO>
         return cultorPage.map(this::toCultorResponse);
     }
 
     /**
-     * MÉTODO 'toCultor' REFACTORIZADO Y RENOMBRADO
-     * Ahora se llama 'mapAndValidateCultor' y actualiza un objeto 'Cultor' existente
-     * o uno nuevo.
+     * Retrieves a single cultor by its primary key ID.
      *
-     * @param cultor        La entidad Cultor a rellenar (puede ser nueva o existente).
-     * @param cultorRequest Incoming DTO con cultor data.
-     * @return El objeto Cultor (pasado como argumento) rellenado y validado.
+     * @param id The ID of the cultor.
+     * @return A {@link ResponseEntity} with the found {@link CultorResponse} and HTTP 200 (OK).
+     * @throws EntityNotFoundException If the ID is not found.
+     */
+    @SuppressWarnings("null")
+    public ResponseEntity<CultorResponse> getById(Integer id) {
+        // Find by ID or throw 404
+        Cultor cultor = cultorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Cultor Not Found With Id: " + id));
+
+        return ResponseEntity.ok(toCultorResponse(cultor));
+    }
+
+    /**
+     * Deletes a cultor by its ID.
+     *
+     * @param id The ID of the cultor to delete.
+     * @return A {@link ResponseEntity} with HTTP 204 (No Content).
+     * @throws EntityNotFoundException If the ID is not found.
+     */
+    public ResponseEntity<Void> delete(Integer id) {
+        // 1. Check if it exists first (to provide a clear 404)
+        if (!cultorRepository.existsById(id)) {
+            throw new EntityNotFoundException("Cultor Not Found With Id: " + id);
+        }
+
+        // 2. Delete the entity
+        cultorRepository.deleteById(id);
+
+        // 3. Return 204 No Content
+        return ResponseEntity.noContent().build();
+    }
+
+    // ----------------------------------------------------------------
+    // PRIVATE HELPER METHODS
+    // ----------------------------------------------------------------
+
+    /**
+     * Core private helper. Maps data from a {@link CultorRequest} DTO to a {@link Cultor} entity.
+     * <p>
+     * This method performs all field-level validation, normalization (trim, toLowerCase),
+     * and relational integrity checks (e.g., Parish belongs to Municipality).
+     * <p>
+     * It's designed to be reusable for both {@code create} (with a new Cultor()) and
+     * {@code update} (with an existing Cultor).
+     *
+     * @param cultor        The entity to map data onto (can be new or existing).
+     * @param cultorRequest The DTO source of new data.
+     * @return The same {@link Cultor} entity, now populated and validated.
+     * @throws EntityNotFoundException  If related entities (Municipality, etc.) are not found.
+     * @throws IllegalArgumentException If any business rule or validation fails.
      */
     @SuppressWarnings("null")
     private Cultor mapAndValidateCultor(Cultor cultor, CultorRequest cultorRequest) {
 
-        // Validate and normalize names
+        // --- Basic Field Validation & Normalization ---
         String firstName = cultorRequest.getFirstName();
         if (!StringValidator.isValidName(firstName))
             throw new IllegalArgumentException("FirstName Is Invalid");
         firstName = StringUtils.toCapitalize(firstName);
+
         String lastName = cultorRequest.getLastName();
         if (!StringValidator.isValidName(lastName))
             throw new IllegalArgumentException("LastName Is Invalid");
         lastName = StringUtils.toCapitalize(lastName);
-        // Validate gender field
+
         String gender = cultorRequest.getGender().trim().toUpperCase();
         if (!gender.equals("F") && !gender.equals("M"))
             throw new IllegalArgumentException("Gender Is Invalid");
 
-        // Validate and trim other basic fields
         String idNumber = cultorRequest.getIdNumber().trim();
 
         LocalDate birthDate = cultorRequest.getBirthDate();
@@ -222,71 +270,47 @@ public class CultorService {
 
         String phoneNumber = cultorRequest.getPhoneNumber().trim();
 
-        // Normalize Email or set null if blank
+        // --- Nullable Field Normalization (Email, Instagram) ---
         String email = cultorRequest.getEmail();
-        if (email == null || email.isBlank()) {
-            email = null;
-        } else {
-            email = email.trim().toLowerCase();
-        }
+        email = (email == null || email.isBlank()) ? null : email.trim().toLowerCase();
 
-        // Normalize Instagram username or set null if blank
         String instagramUser = cultorRequest.getInstagramUser();
-        if (instagramUser == null || instagramUser.isBlank()) {
-            instagramUser = null;
-        } else {
-            instagramUser = instagramUser.trim().toLowerCase();
-        }
+        instagramUser = (instagramUser == null || instagramUser.isBlank()) ? null : instagramUser.trim().toLowerCase();
 
-        // Fetch and validate related entities
+        // --- Relational Integrity Checks (Location) ---
         Municipality municipality = municipalityRepository.findById(cultorRequest.getMunicipalityId())
                 .orElseThrow(() -> new EntityNotFoundException("Municipality Not Found"));
         Parish parish = parishRepository.findById(cultorRequest.getParishId())
                 .orElseThrow(() -> new EntityNotFoundException("Parish Not Found"));
 
-        // Ensure parish belongs to municipality
-        validateParishId(parish, cultorRequest);
-        String homeAddress = cultorRequest.getHomeAddress();
-        homeAddress = StringUtils.toCapitalize(homeAddress);
+        validateParishId(parish, cultorRequest); // Business rule check
+        String homeAddress = StringUtils.toCapitalize(cultorRequest.getHomeAddress());
+
+        // --- Relational Integrity Checks (Arts) ---
         ArtCategory artCategory = artCategoryRepository.findById(cultorRequest.getArtCategoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Art Category Not Found"));
         ArtDiscipline artDiscipline = artDisciplineRepository.findById(cultorRequest.getArtDisciplineId())
                 .orElseThrow(() -> new EntityNotFoundException("Art Discipline Not Found"));
+        
         String otherDiscipline = cultorRequest.getOtherDiscipline();
-        if (otherDiscipline == null || otherDiscipline.isBlank()) {
-            otherDiscipline = null;
-        } else {
-            otherDiscipline = StringUtils.toCapitalize(otherDiscipline.trim());
-        }
-        // Ensure art discipline belongs to category
-        validateArtDisciplineId(artDiscipline, cultorRequest);
-        validateOtherDiscipline(artDiscipline, otherDiscipline);
+        otherDiscipline = (otherDiscipline == null || otherDiscipline.isBlank()) ? null : StringUtils.toCapitalize(otherDiscipline.trim());
 
+        validateArtDisciplineId(artDiscipline, cultorRequest); // Business rule check
+        validateOtherDiscipline(artDiscipline, otherDiscipline); // Business rule check
+
+        // --- Other Fields ---
         int yearsofExperience = cultorRequest.getYearsOfExperience();
 
-        // Normalize group name or set null
         String groupName = cultorRequest.getGroupName();
-        if (groupName == null || groupName.isBlank()) {
-            groupName = null;
-        } else {
-            groupName = StringUtils.toCapitalize(groupName);
-        }
+        groupName = (groupName == null || groupName.isBlank()) ? null : StringUtils.toCapitalize(groupName);
 
-        // Normalize disability and illness fields or set null
         String disability = cultorRequest.getDisability();
-        if (disability == null || disability.isBlank()) {
-            disability = null;
-        } else {
-            disability = disability.trim().toLowerCase();
-        }
-        String illness = cultorRequest.getIllness();
-        if (illness == null || illness.isBlank()) {
-            illness = null;
-        } else {
-            illness = illness.trim().toLowerCase();
-        }
+        disability = (disability == null || disability.isBlank()) ? null : disability.trim().toLowerCase();
 
-        // Create and populate Cultor entity
+        String illness = cultorRequest.getIllness();
+        illness = (illness == null || illness.isBlank()) ? null : illness.trim().toLowerCase();
+
+        // --- Set all fields on the entity ---
         cultor.setFirstName(firstName);
         cultor.setLastName(lastName);
         cultor.setGender(gender);
@@ -310,10 +334,10 @@ public class CultorService {
     }
 
     /**
-     * Converts Cultor entity to CultorResponse DTO for client consumption.
-     * 
-     * @param cultor Entity to convert.
-     * @return DTO representing the cultor.
+     * Converts a {@link Cultor} entity to its public-facing {@link CultorResponse} DTO.
+     *
+     * @param cultor The entity to convert.
+     * @return The corresponding DTO.
      */
     private CultorResponse toCultorResponse(Cultor cultor) {
         int id = cultor.getId();
@@ -337,18 +361,14 @@ public class CultorService {
         String illness = cultor.getIllness();
         LocalDate createdAt = cultor.getCreatedAt();
 
-        CultorResponse cultorResponse = new CultorResponse(id, firstName, lastName, gender, idNumber,
+        return new CultorResponse(id, firstName, lastName, gender, idNumber,
                 birthDate, phoneNumber, email, instagramUser, municipalityId, parishId, homeAddress, artCategoryId,
                 artDisciplineId, otherDiscipline, yearsOfExperience, groupName, disability, illness, createdAt);
-
-        return cultorResponse;
     }
 
     /**
      * Validates that the selected Parish belongs to the specified Municipality.
-     * 
-     * @param parish        Parish entity to check.
-     * @param cultorRequest Request containing the Municipality ID.
+     *
      * @throws IllegalArgumentException if Parish does not belong to Municipality.
      */
     private void validateParishId(Parish parish, CultorRequest cultorRequest) {
@@ -361,9 +381,7 @@ public class CultorService {
     /**
      * Validates that the selected Art Discipline belongs to the specified Art
      * Category.
-     * 
-     * @param artDiscipline ArtDiscipline entity to check.
-     * @param cultorRequest Request containing the Art Category ID.
+     *
      * @throws IllegalArgumentException if Discipline does not belong to Category.
      */
     private void validateArtDisciplineId(ArtDiscipline artDiscipline, CultorRequest cultorRequest) {
@@ -373,6 +391,13 @@ public class CultorService {
         }
     }
 
+    /**
+     * Validates the logic for the 'otherDiscipline' field.
+     * Ensures 'otherDiscipline' is ONLY provided if the selected discipline is "Otra...",
+     * and MUST be provided if it is.
+     *
+     * @throws IllegalArgumentException If the logic is violated.
+     */
     private void validateOtherDiscipline(ArtDiscipline artDiscipline, String otherDiscipline) {
         if (!artDiscipline.getName().equals("Otra...") && otherDiscipline != null && !otherDiscipline.isBlank()) {
             throw new IllegalArgumentException("The Selected Discipline Does Not Is \"Otra...\"");
@@ -381,42 +406,4 @@ public class CultorService {
             throw new IllegalArgumentException("OtherDiscipline Is Requerid");
         }
     }
-
-    /**
-     * Elimina un cultor por su ID.
-     *
-     * @param id El ID del cultor a eliminar.
-     * @return ResponseEntity sin contenido (204 No Content).
-     * @throws EntityNotFoundException si el cultor no se encuentra.
-     */
-    public ResponseEntity<Void> delete(Integer id) {
-        // 1. Verificar si el cultor existe antes de intentar borrar
-        if (!cultorRepository.existsById(id)) {
-            throw new EntityNotFoundException("Cultor Not Found With Id: " + id);
-        }
-
-        // 2. Si existe, eliminarlo
-        cultorRepository.deleteById(id);
-
-        // 3. Devolver una respuesta HTTP 204 No Content (éxito, sin cuerpo)
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Obtiene un cultor por su ID.
-     *
-     * @param id El ID del cultor a buscar.
-     * @return ResponseEntity con el CultorResponse (DTO).
-     * @throws EntityNotFoundException si el cultor no se encuentra.
-     */
-    @SuppressWarnings("null")
-    public ResponseEntity<CultorResponse> getById(Integer id) {
-        // 1. Buscar el cultor por ID o lanzar 404
-        Cultor cultor = cultorRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cultor Not Found With Id: " + id));
-
-        // 2. Convertir la entidad a DTO y devolverlo con un 200 OK
-        return ResponseEntity.ok(toCultorResponse(cultor));
-    }
-
 }

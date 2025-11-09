@@ -1,29 +1,54 @@
 {
+  /**
+   * Defines the name of the development environment shown in VS Code.
+   */
   "name": "SICUC Backend Dev Environment",
-  
+
+  /**
+   * Specifies the Docker Compose file used to define the services (backend, db, etc.).
+   * Points specifically to the development environment file.
+   */
   "dockerComposeFile": [
     "../docker-compose.dev.yml"
   ],
-  
-  // ✅ El Dev Container ahora sabe que debe levantar estos servicios
-  // y construir la imagen, sin necesidad de perfiles especiales.
-  
+
+  /**
+   * Specifies which service defined in docker-compose.dev.yml VS Code should attach to.
+   * This is the main Java application container.
+   */
   "service": "sicuc-backend",
+
+  /**
+   * Sets the workspace root directory inside the container, matching the file system.
+   */
   "workspaceFolder": "/app",
+
+  /**
+   * Specifies the user to run the environment processes as inside the container.
+   */
   "remoteUser": "root",
-  
+
+  /**
+   * Customizes the VS Code instance running inside the container.
+   */
   "customizations": {
     "vscode": {
       "settings": {
+        // Ensures the Java language server starts in 'Standard' mode for better performance/reliability.
         "java.server.launchMode": "Standard" 
       },
+      // Essential VS Code extensions installed automatically inside the container
       "extensions": [
-        "vscjava.vscode-java-pack", 
-        "vmware.vscode-spring-boot",
-        "redhat.vscode-yaml"
+        "vscjava.vscode-java-pack",      // Java Extension Pack
+        "vmware.vscode-spring-boot",    // Spring Boot Tools
+        "redhat.vscode-yaml"            // YAML Language Support (for Docker Compose)
       ]
     }
   },
-  
+
+  /**
+   * Command executed immediately after the container is created (e.g., install OS packages).
+   * 'sh' is used here to execute subsequent shell commands.
+   */
   "postCreateCommand": "sh"
 }

@@ -1,21 +1,34 @@
 package com.culturacarabobo.sicuc.backend.dtos;
 
 /**
- * DTO for transferring Parish data in API responses.
+ * Data Transfer Object (DTO) for sending {@link com.culturacarabobo.sicuc.backend.entities.Parish}
+ * data to the client.
+ * <p>
+ * This is an immutable data carrier class.
  */
-public class ParishResponse {
-
-    // Unique identifier for the parish
-    private int id;
-
-    // Name of the parish
-    private String name;
-
-    // ID of the municipality this parish belongs to
-    private int municipalityId;
+public final class ParishResponse {
 
     /**
-     * Constructor to initialize all fields of ParishResponse.
+     * The unique identifier (primary key) for the parish.
+     */
+    private final int id;
+
+    /**
+     * The name of the parish (e.g., "San José").
+     */
+    private final String name;
+
+    /**
+     * The foreign key ID of the parent {@link com.culturacarabobo.sicuc.backend.entities.Municipality}.
+     */
+    private final int municipalityId;
+
+    /**
+     * Constructs a new ParishResponse.
+     *
+     * @param id             The ID of the parish.
+     * @param name           The name of the parish.
+     * @param municipalityId The ID of the parent municipality.
      */
     public ParishResponse(int id, String name, int municipalityId) {
         this.id = id;
@@ -23,30 +36,18 @@ public class ParishResponse {
         this.municipalityId = municipalityId;
     }
 
-    // Getters and setters
+    // --- Standard Getters ---
+    // (No setters are provided, as this is an immutable DTO)
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getMunicipalityId() {
         return municipalityId;
     }
-
-    public void setMunicipalityId(int municipalityId) {
-        this.municipalityId = municipalityId;
-    }
-
 }

@@ -1,40 +1,42 @@
 package com.culturacarabobo.sicuc.backend.dtos;
 
 /**
- * Data Transfer Object used to send municipality data in API responses.
+ * Data Transfer Object (DTO) for sending {@link com.culturacarabobo.sicuc.backend.entities.Municipality}
+ * data to the client.
+ * <p>
+ * This is an immutable data carrier class.
  */
-public class MunicipalityResponse {
-
-    // Unique identifier for the municipality
-    private int id;
-
-    // Name of the municipality
-    private String name;
+public final class MunicipalityResponse {
 
     /**
-     * Constructor to initialize the DTO with id and name.
+     * The unique identifier (primary key) for the municipality.
+     */
+    private final int id;
+
+    /**
+     * The name of the municipality (e.g., "Valencia").
+     */
+    private final String name;
+
+    /**
+     * Constructs a new MunicipalityResponse.
+     *
+     * @param id   The ID of the municipality.
+     * @param name The name of the municipality.
      */
     public MunicipalityResponse(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    // Getters and setters
+    // --- Standard Getters ---
+    // (No setters are provided, as this is an immutable DTO)
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
 }

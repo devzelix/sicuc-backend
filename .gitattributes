@@ -1,10 +1,25 @@
-# 1. Normalizar todo el código fuente (por defecto)
-# Esto asegura que todos los archivos de texto sean LF en el repositorio.
+# ===================================================================
+# == GIT ATTRIBUTES CONFIGURATION
+# ===================================================================
+
+# This file configures Git to manage line endings consistently across different 
+# operating systems (Windows, Linux, macOS) to prevent cross-platform build issues.
+
+# 1. Default Rule: Normalize Text Files
+# ------------------------------------
+# Sets text files to be automatically converted: 
+# - text=auto: Git decides if a file is text or binary.
+# - eol=lf: All text files are stored in the repository with Unix-style (LF) line endings.
 * text=auto eol=lf
 
-# 2. Excepciones que requieren CRLF para funcionar en Windows (¡MANTENER!)
-# Si estos archivos no están en CRLF, los scripts de Windows fallarán.
+# 2. Windows Script Exceptions (CRLF Required)
+# -------------------------------------------
+# Forces Windows batch scripts to use Windows-style (CRLF) endings, as
+# Windows systems often require this format for execution.
 *.cmd text eol=crlf
 
-# 3. Scripts que deben ser LF (¡MANTENER!)
+# 3. Unix Executable Scripts (LF Required)
+# --------------------------------------
+# Explicitly sets the primary executable (Maven Wrapper) to Unix-style (LF)
+# to ensure it remains executable on Linux/macOS.
 /mvnw text eol=lf

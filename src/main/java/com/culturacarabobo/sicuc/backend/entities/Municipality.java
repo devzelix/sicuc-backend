@@ -4,19 +4,32 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // Marks this class as a JPA entity
-@Table(name = "municipalities") // Maps the entity to the "municipalities" table
+/**
+ * Represents a Municipality entity (e.g., "Valencia", "Naguanagua").
+ * <p>
+ * This entity maps to the {@code municipalities} table and serves as a
+ * lookup table for classifying {@link Parish} and {@link Cultor} entities.
+ */
+@Entity
+@Table(name = "municipalities")
 public class Municipality {
 
+    /**
+     * The unique identifier (primary key) for the municipality.
+     * Auto-incremented by the database.
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremented primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(length = 100, nullable = false, unique = true) // Column constraints: max length, not null, unique
+    /**
+     * The name of the municipality (e.g., "Valencia").
+     * Must be unique and non-null.
+     */
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     /**
@@ -26,15 +39,15 @@ public class Municipality {
     }
 
     /**
-     * Convenience constructor for creating a Municipality with a name.
+     * Convenience constructor to create a new Municipality with a name.
      *
-     * @param name the name of the municipality
+     * @param name The name of the municipality.
      */
     public Municipality(String name) {
         this.name = name;
     }
 
-    // Getters and setters
+    // --- Standard Getters and Setters ---
 
     public int getId() {
         return id;
@@ -51,5 +64,4 @@ public class Municipality {
     public void setName(String name) {
         this.name = name;
     }
-
 }

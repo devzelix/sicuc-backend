@@ -4,19 +4,32 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity // Marks this class as a JPA entity
-@Table(name = "art_categories") // Maps the entity to the "art_categories" table
+/**
+ * Represents an Art Category entity (e.g., "Música", "Artesanía", "Danza").
+ * <p>
+ * This entity maps to the {@code art_categories} table and serves as a
+ * lookup table for classifying {@link ArtDiscipline} and {@link Cultor} entities.
+ */
+@Entity
+@Table(name = "art_categories")
 public class ArtCategory {
 
+    /**
+     * The unique identifier (primary key) for the art category.
+     * Auto-incremented by the database.
+     */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-incremented primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(length = 100, nullable = false, unique = true) // Column must be unique, non-null, max length 100
+    /**
+     * The name of the art category (e.g., "Música").
+     * Must be unique and non-null.
+     */
+    @Column(length = 100, nullable = false, unique = true)
     private String name;
 
     /**
@@ -26,15 +39,15 @@ public class ArtCategory {
     }
 
     /**
-     * Convenience constructor to create an ArtCategory with a name.
+     * Convenience constructor to create a new ArtCategory with a name.
      *
-     * @param name the name of the art category
+     * @param name The name of the art category.
      */
     public ArtCategory(String name) {
         this.name = name;
     }
 
-    // Getters and setters
+    // --- Standard Getters and Setters ---
 
     public int getId() {
         return id;
@@ -51,5 +64,4 @@ public class ArtCategory {
     public void setName(String name) {
         this.name = name;
     }
-
 }

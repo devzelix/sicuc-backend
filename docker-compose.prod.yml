@@ -1,26 +1,31 @@
-# docker-compose.prod.yml (Para despliegue a Producción)
+# ===================================================================
+# == DOCKER COMPOSE CONFIGURATION (Production Environment)
+# ===================================================================
+
+# This file orchestrates the multi-container environment for production deployment.
+# It uses optimized images and ensures robust container linking and persistence.
 services:
-  # 🟦 Backend SICUC (Producción)
+  # 🟦 Backend SICUC (The Spring Boot Application)
   sicuc-backend:
     build:
       context: .
       dockerfile: Dockerfile
-      target: runtime # ✅ Correcto: Fuerza la compilación de la imagen ligera
-      
+      # PRACTICE: Uses the smaller 'runtime' stage (JRE only) from the Dockerfile.
+      # This drastically reduces the image size for production deployment.
+      target: runtime 
     image: sicuc-backend-image:latest
     container_name: sicuc-backend
     restart: always
     
-    # 🔑 CORRECCIÓN 1: Carga todas las variables de .env al backend
+    # Loads all environment variables (especially secrets) from the local .env file
     env_file: .env 
 
-    # 🔑 CORRECCIÓN 2: Sobrescribe las variables que necesitan ser inyectadas como args de Java 
-    # y las que Spring lee directamente (Datasource URL, JWT, etc.)
+    # Explicitly injects required variables for the Java process and application properties
     environment:
-      # Forzamos el perfil 'prod' usando el argumento de Java (anula el application.properties)
+      # Forces the Spring application to run with the 'prod' profile
       - MAVEN_OPTS=-Dspring.profiles.active=prod
       
-      # Inyectamos el resto de las variables requeridas por la aplicación:
+      # Inject the remaining variables needed by the running application
       - API_BASE_PATH=${API_BASE_PATH}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=${SPRING_JPA_HIBERNATE_DDL_AUTO}
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
@@ -29,10 +34,12 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - JWT_ACCESS_TOKEN_EXPIRATION=${JWT_ACCESS_TOKEN_EXPIRATION}
       - JWT_REFRESH_TOKEN_EXPIRATION=${JWT_REFRESH_TOKEN_EXPIRATION}
-    
+      
+    # Exposes the application port (8080)
     ports:
       - "8080:8080"
-      
+    
+    # Waits for the database to be fully healthy before attempting to start the application
     depends_on:
       sicuc-db:
         condition: service_healthy
@@ -40,13 +47,13 @@ services:
     networks:
       - sicuc-app-network
 
-  # 🟨 Base de datos MySQL (Producción)
+  # 🟨 Base de datos MySQL (Production Data Store)
   sicuc-db:
     image: mysql:8.0
     container_name: sicuc-db
-    restart: always
+    restart: always # Ensures continuous database service
     
-    # ✅ Correcto: Carga las variables de DB desde el .env
+    # Loads configuration and secrets from .env
     env_file: .env
     
     environment:
@@ -55,22 +62,57 @@ services:
       MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
       MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       
+    # IMPORTANT: Persists database data on the host machine using a volume (db_data)
     volumes:
       - db_data:/var/lib/mysql
 
+    # Defines the database readiness check
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD_SECRET"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 30s 
       
     networks:
       - sicuc-app-network
 
+  # 🟢 SICUC Database Backup Service
+  sicuc-backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    image: sicuc-backup-image:latest
+    container_name: sicuc-backup
+    restart: always
+    env_file: .env  # Automatically loads DB credentials and secrets
+    environment:
+      # Override defaults if needed
+      - CONTAINER_NAME=sicuc-db
+      - DATABASE_NAME=sicuc_db
+      - ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD_SECRET}
+      - BACKUP_DIR=/backups
+      - LOG_DIR=/var/log/sicuc_backups
+      - RETENTION_DAYS=7
+      - EMAIL_ON_ERROR=
+    volumes:
+      # Persist backups and logs
+      - backup_data:/backups
+      - backup_logs:/var/log/sicuc_backups
+      - ./scripts:/app
+    depends_on:
+      sicuc-db:
+        condition: service_healthy
+    networks:
+      - sicuc-app-network
+
+# Define persistent storage volumes for database data
 volumes:
   db_data:
+  backup_data:
+  backup_logs:
 
+# Define a custom network to allow containers to communicate privately
 networks:
   sicuc-app-network:
     name: sicuc-internal-network

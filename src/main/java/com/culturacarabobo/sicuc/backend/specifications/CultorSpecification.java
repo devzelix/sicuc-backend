@@ -13,68 +13,63 @@ import org.springframework.data.jpa.domain.Specification;
 import com.culturacarabobo.sicuc.backend.entities.Cultor;
 
 /**
- * Specification class for building dynamic query filters for Cultor entities.
- * Uses JPA Criteria API to create predicates based on provided filter
- * parameters.
+ * Creates dynamic JPA Specifications for the {@link Cultor} entity.
+ * <p>
+ * This class is used by {@link com.culturacarabobo.sicuc.backend.services.CultorService}
+ * to build complex, multi-parameter search queries.
  */
 public class CultorSpecification {
 
     /**
-     * Creates a Specification with multiple optional filters for querying Cultor
-     * entities.
-     * Supports filtering by name/id/phone (with flexible multi-part query),
-     * gender, location (municipality, parish),
-     * art category and discipline, and health conditions.
+     * Creates a {@link Specification} for {@link Cultor} using optional filter parameters.
+     * <p>
+     * This method dynamically builds a JPA query by combining multiple predicates with an AND operator.
      *
-     * @param query           A search string for name, ID, or phone (supports 1-4
-     *                        parts)
-     * @param gender          Filter by gender ("M" or "F")
-     * @param municipalityId  Filter by municipality ID
-     * @param parishId        Filter by parish ID
-     * @param artCategoryId   Filter by art category ID
-     * @param artDisciplineId Filter by art discipline ID
-     * @param hasDisability   Filter by presence or absence of disability
-     * @param hasIllness      Filter by presence or absence of illness
-     * @return Specification<Cultor> applying the given filters
+     * @param query           Optional search string for name, ID, or phone (supports 1-4 parts).
+     * @param gender          Optional filter by gender ("M" or "F").
+     * @param municipalityId  Optional filter by municipality ID.
+     * @param parishId        Optional filter by parish ID.
+     * @param artCategoryId   Optional filter by art category ID.
+     * @param artDisciplineId Optional filter by art discipline ID.
+     * @param hasDisability   Optional filter by presence (true) or absence (false) of disability.
+     * @param hasIllness      Optional filter by presence (true) or absence (false) of illness.
+     * @return A {@link Specification<Cultor>} that applies the given filters.
      */
     public static Specification<Cultor> withFilters(String query, String gender, Integer municipalityId,
             Integer parishId,
             Integer artCategoryId,
             Integer artDisciplineId, Boolean hasDisability, Boolean hasIllness) {
 
+        // The Specification is implemented as a lambda function
         return (Root<Cultor> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) -> {
+            
+            // A list to hold all individual filter conditions (predicates)
             List<Predicate> predicates = new ArrayList<>();
 
-            // Process the search query for name, ID number or phone
+            // --- Full-Text Search Query Logic ---
             if (query != null && !query.trim().isEmpty()) {
                 String normalizedQuery = query.trim().toLowerCase();
                 String[] parts = normalizedQuery.split("\\s+");
 
+                // This logic dynamically changes the search behavior based on the number of words
                 switch (parts.length) {
 
                     case 1:
-                        // Single word: match start of first or last name, or contain in
-                        // idNumber/phoneNumber
+                        // 1 word: "Jose" -> (firstName LIKE 'jose%' OR lastName LIKE 'jose%' OR idNumber LIKE '%jose%'...)
                         String part = parts[0];
-
                         List<Predicate> singleWordPredicates = new ArrayList<>();
-
                         singleWordPredicates.add(cb.like(cb.lower(root.get("firstName")), part + "%"));
                         singleWordPredicates.add(cb.like(cb.lower(root.get("lastName")), part + "%"));
-
                         singleWordPredicates.add(cb.like(cb.lower(root.get("idNumber")), "%" + part + "%"));
-
                         singleWordPredicates.add(cb.like(cb.lower(root.get("phoneNumber")), "%" + part + "%"));
-
-                        // Combine all single word conditions with OR
+                        
                         predicates.add(cb.or(singleWordPredicates.toArray(new Predicate[0])));
                         break;
 
                     case 2:
-                        // Two words: try matching full first or last name, or firstName + lastName
-                        // pattern
+                        // 2 words: "Jose Perez" -> ( (firstName LIKE 'jose perez%') OR (lastName LIKE 'jose perez%') OR
+                        //                           (firstName LIKE 'jose%' AND lastName LIKE 'perez%') )
                         String firstTwo = parts[0] + " " + parts[1];
-
                         predicates.add(cb.or(
                                 cb.like(cb.lower(root.get("firstName")), firstTwo + "%"),
                                 cb.like(cb.lower(root.get("lastName")), firstTwo + "%"),
@@ -83,7 +78,8 @@ public class CultorSpecification {
                                         cb.like(cb.lower(root.get("lastName")), parts[1] + "%"))));
                         break;
                     case 3:
-                        // Three words: consider compound first or last names with combinations
+                        // 3 words: "Jose Angel Perez" -> ( (firstName LIKE 'jose angel%' AND lastName LIKE 'perez%') OR
+                        //                                (firstName LIKE 'jose%' AND lastName LIKE 'angel perez%') )
                         String firstTwoAsFirstName = parts[0] + " " + parts[1];
                         String lastTwoAsLastName = parts[1] + " " + parts[2];
 
@@ -96,7 +92,7 @@ public class CultorSpecification {
                                         cb.like(cb.lower(root.get("lastName")), lastTwoAsLastName + "%"))));
                         break;
                     case 4:
-                        // Four words: split into full first and last names
+                        // 4 words: "Jose Angel Perez Garcia" -> (firstName LIKE 'jose angel%' AND lastName LIKE 'perez garcia%')
                         String fullFirstName = parts[0] + " " + parts[1];
                         String fullLastName = parts[2] + " " + parts[3];
 
@@ -104,65 +100,58 @@ public class CultorSpecification {
                                 cb.like(cb.lower(root.get("firstName")), fullFirstName + "%"),
                                 cb.like(cb.lower(root.get("lastName")), fullLastName + "%")));
                         break;
-
                 }
             }
 
-            // Add filter by gender if provided
+            // --- Simple Equality Filters ---
             if (gender != null) {
                 predicates.add(cb.equal(root.get("gender"), gender));
             }
 
-            // Filter by municipality if provided
+            // --- Relational (Join) Filters ---
             if (municipalityId != null) {
                 predicates.add(cb.equal(root.join("municipality").get("id"), municipalityId));
             }
-
-            // Filter by parish if provided
             if (parishId != null) {
-                // CAMBIA .get("parish") POR .join("parish")
                 predicates.add(cb.equal(root.join("parish").get("id"), parishId));
             }
-
-            // Filter by art category if provided
             if (artCategoryId != null) {
-                // CAMBIA .get("artCategory") POR .join("artCategory")
                 predicates.add(cb.equal(root.join("artCategory").get("id"), artCategoryId));
             }
-
-            // Filter by art discipline if provided
             if (artDisciplineId != null) {
-                // CAMBIA .get("artDiscipline") POR .join("artDiscipline")
                 predicates.add(cb.equal(root.join("artDiscipline").get("id"), artDisciplineId));
             }
 
-            // Filter by presence or absence of disability
+            // --- Boolean Logic Filters (Has/HasNot) ---
             if (hasDisability != null) {
                 if (hasDisability) {
+                    // Find cultores WITH a disability (field is not null AND not an empty string)
                     predicates.add(cb.and(
                             cb.isNotNull(root.get("disability")),
                             cb.notEqual(root.get("disability"), "")));
                 } else {
+                    // Find cultores WITHOUT a disability (field is null OR is an empty string)
                     predicates.add(cb.or(
                             cb.isNull(root.get("disability")),
                             cb.equal(root.get("disability"), "")));
                 }
             }
 
-            // Filter by presence or absence of illness
             if (hasIllness != null) {
                 if (hasIllness) {
+                    // Find cultores WITH an illness
                     predicates.add(cb.and(
                             cb.isNotNull(root.get("illness")),
                             cb.notEqual(root.get("illness"), "")));
                 } else {
+                    // Find cultores WITHOUT an illness
                     predicates.add(cb.or(
                             cb.isNull(root.get("illness")),
                             cb.equal(root.get("illness"), "")));
                 }
             }
 
-            // Combine all predicates with AND operator
+            // Combine all individual predicates into a single WHERE clause
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

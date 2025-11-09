@@ -3,71 +3,78 @@ package com.culturacarabobo.sicuc.backend.dtos;
 import java.time.LocalDate;
 
 /**
- * DTO for sending cultor data back to the client.
+ * Data Transfer Object (DTO) for sending {@link com.culturacarabobo.sicuc.backend.entities.Cultor}
+ * data to the client.
+ * <p>
+ * This class is an immutable data carrier. It is populated by the service
+ * layer and serialized to JSON for the API response.
  */
-public class CultorResponse {
+public final class CultorResponse {
 
-    // Unique database ID
-    private int id;
+    /** The unique database identifier (primary key). */
+    private final int id;
 
-    // First name
-    private String firstName;
+    /** The cultor's first name. */
+    private final String firstName;
 
-    // Last name
-    private String lastName;
+    /** The cultor's last name. */
+    private final String lastName;
 
-    // Gender
-    private String gender;
+    /** The cultor's gender (e.g., "M", "F"). */
+    private final String gender;
 
-    // National ID number (e.g., V-12345678)
-    private String idNumber;
+    /** The cultor's national identification number (e.g., "V-12345678"). */
+    private final String idNumber;
 
-    // Date of birth
-    private LocalDate birthDate;
+    /** The cultor's date of birth. */
+    private final LocalDate birthDate;
 
-    // Phone number (e.g., 0412-1234567)
-    private String phoneNumber;
+    /** The cultor's primary phone number. */
+    private final String phoneNumber;
 
-    // Email address (optional)
-    private String email;
+    /** The cultor's email address (optional). */
+    private final String email;
 
-    // Instagram username (optional)
-    private String instagramUser;
+    /** The cultor's Instagram handle (optional). */
+    private final String instagramUser;
 
-    // Municipality ID
-    private int municipalityId;
+    /** The foreign key ID of the associated Municipality. */
+    private final int municipalityId;
 
-    // Parish ID
-    private int parishId;
+    /** The foreign key ID of the associated Parish. */
+    private final int parishId;
 
-    // Full home address
-    private String homeAddress;
+    /** The cultor's full home address. */
+    private final String homeAddress;
 
-    // Art category ID
-    private int artCategoryId;
+    /** The foreign key ID of the associated ArtCategory. */
+    private final int artCategoryId;
 
-    // Art discipline ID
-    private int artDisciplineId;
+    /** The foreign key ID of the associated ArtDiscipline. */
+    private final int artDisciplineId;
 
-    // Other Discipline (optional)
-    private String otherDiscipline;
+    /** A free-text field for a custom discipline (optional). */
+    private final String otherDiscipline;
 
-    // Total years of experience in the field
-    private int yearsOfExperience;
+    /** Total years of experience in the field. */
+    private final int yearsOfExperience;
 
-    // Artistic group name (optional)
-    private String groupName;
+    /** The name of any group the cultor belongs to (optional). */
+    private final String groupName;
 
-    // Disability description (optional)
-    private String disability;
+    /** Description of any disability (optional). */
+    private final String disability;
 
-    // Illness description (optional)
-    private String illness;
+    /** Description of any chronic illness (optional). */
+    private final String illness;
 
-    // Creation date
-    private LocalDate createdAt;
+    /** The timestamp of when the cultor was registered. */
+    private final LocalDate createdAt;
 
-    // Constructor with all fields
+    /**
+     * All-arguments constructor for creating the response DTO.
+     * This is typically called by the service layer during entity-to-DTO mapping.
+     */
     public CultorResponse(int id, String firstName, String lastName, String gender, String idNumber,
             LocalDate birthDate, String phoneNumber, String email, String instagramUser, int municipalityId,
             int parishId, String homeAddress, int artCategoryId, int artDisciplineId, String otherDiscipline,
@@ -94,166 +101,86 @@ public class CultorResponse {
         this.createdAt = createdAt;
     }
 
-    // Getters and setters
+    // --- Standard Getters ---
+    // (No setters are provided, as this is an immutable DTO)
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 
     public String getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public String getIdNumber() {
         return idNumber;
-    }
-
-    public void setIdNumber(String idNumber) {
-        this.idNumber = idNumber;
     }
 
     public LocalDate getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
     public String getPhoneNumber() {
         return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getInstagramUser() {
         return instagramUser;
-    }
-
-    public void setInstagramUser(String instagramUser) {
-        this.instagramUser = instagramUser;
     }
 
     public int getMunicipalityId() {
         return municipalityId;
     }
 
-    public void setMunicipalityId(int municipalityId) {
-        this.municipalityId = municipalityId;
-    }
-
     public int getParishId() {
         return parishId;
-    }
-
-    public void setParishId(int parishId) {
-        this.parishId = parishId;
     }
 
     public String getHomeAddress() {
         return homeAddress;
     }
 
-    public void setHomeAddress(String homeAddress) {
-        this.homeAddress = homeAddress;
-    }
-
     public int getArtCategoryId() {
         return artCategoryId;
-    }
-
-    public void setArtCategoryId(int artCategoryId) {
-        this.artCategoryId = artCategoryId;
     }
 
     public int getArtDisciplineId() {
         return artDisciplineId;
     }
 
-    public void setArtDisciplineId(int artDisciplineId) {
-        this.artDisciplineId = artDisciplineId;
-    }
-
     public String getOtherDiscipline() {
         return otherDiscipline;
-    }
-
-    public void setOtherDiscipline(String otherDiscipline) {
-        this.otherDiscipline = otherDiscipline;
     }
 
     public int getYearsOfExperience() {
         return yearsOfExperience;
     }
 
-    public void setYearsOfExperience(int yearsOfExperience) {
-        this.yearsOfExperience = yearsOfExperience;
-    }
-
     public String getGroupName() {
         return groupName;
-    }
-
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
     }
 
     public String getDisability() {
         return disability;
     }
 
-    public void setDisability(String disability) {
-        this.disability = disability;
-    }
-
     public String getIllness() {
         return illness;
-    }
-
-    public void setIllness(String illness) {
-        this.illness = illness;
     }
 
     public LocalDate getCreatedAt() {
         return createdAt;
     }
-
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
 }

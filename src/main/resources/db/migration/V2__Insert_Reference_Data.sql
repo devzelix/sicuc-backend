@@ -1,12 +1,23 @@
--- V2: Inserción de datos de referencia (Municipios, Parroquias, Categorías, Disciplinas)
+-- Flyway Migration: V2
+-- Title: Insert Reference Data
+-- Author: devzelix
+-- Date: 2025-11-09
+-- Description: Populates the lookup tables (municipalities, parishes, 
+--              art_categories, art_disciplines) with their default values.
+--              Uses subqueries to be ID-agnostic and resilient.
 
--- Municipios
+-- ---------------------------------------------------------------------
+-- Step 1: Municipalities
+-- ---------------------------------------------------------------------
 INSERT INTO municipalities (name) VALUES
 ('Bejuma'), ('Carlos Arvelo'), ('Diego Ibarra'), ('Guacara'), ('Juan José Mora'),
 ('Libertador'), ('Los Guayos'), ('Miranda'), ('Montalbán'), ('Naguanagua'),
 ('Puerto Cabello'), ('San Diego'), ('San Joaquín'), ('Valencia');
 
--- Parroquias (Usamos sub-queries para obtener los IDs correctos)
+-- ---------------------------------------------------------------------
+-- Step 2: Parishes
+-- (Uses subqueries to link to the correct municipality ID)
+-- ---------------------------------------------------------------------
 INSERT INTO parishes (name, municipality_id) VALUES
 ('Bejuma', (SELECT id FROM municipalities WHERE name = 'Bejuma')),
 ('Canoabo', (SELECT id FROM municipalities WHERE name = 'Bejuma')),
@@ -47,44 +58,53 @@ INSERT INTO parishes (name, municipality_id) VALUES
 ('Santa Rosa', (SELECT id FROM municipalities WHERE name = 'Valencia')),
 ('Negro Primero', (SELECT id FROM municipalities WHERE name = 'Valencia'));
 
--- Categorías Artísticas
+-- ---------------------------------------------------------------------
+-- Step 3: Art Categories
+-- ---------------------------------------------------------------------
 INSERT INTO art_categories (name) VALUES
 ('Artes Plásticas'), ('Artesanía'), ('Audiovisuales'), ('Danza'),
 ('Literatura'), ('Música'), ('Teatro');
 
--- Disciplinas Artísticas (Traducción exacta de tu lógica Java,
--- artCategories.get(0) = 'Artes Plásticas', artCategories.get(1) = 'Artesanía', etc.)
+-- ---------------------------------------------------------------------
+-- Step 4: Art Disciplines
+-- ---------------------------------------------------------------------
 INSERT INTO art_disciplines (name, art_category_id) VALUES
-('Cestería', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
-('Dulcería criolla', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
-('Luthería', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
-('Muñequería', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
-('Prendas', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
-('Tejido', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
+-- Artes Plásticas
+('Escultura', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
+('Instalación', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
+('Pintura', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
 ('Otra...', (SELECT id FROM art_categories WHERE name = 'Artes Plásticas')),
+-- Artesanía
+('Cestería', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
 ('Cerámica', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
-('Escultura', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
-('Instalación', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
+('Dulcería criolla', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
+('Luthería', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
+('Muñequería', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
 ('Orfebrería', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
-('Pintura', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
+('Prendas', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
+('Tejido', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
 ('Otra...', (SELECT id FROM art_categories WHERE name = 'Artesanía')),
+-- Audiovisuales
 ('Cine', (SELECT id FROM art_categories WHERE name = 'Audiovisuales')),
 ('Experimental', (SELECT id FROM art_categories WHERE name = 'Audiovisuales')),
 ('Fotografía', (SELECT id FROM art_categories WHERE name = 'Audiovisuales')),
 ('Videoarte', (SELECT id FROM art_categories WHERE name = 'Audiovisuales')),
 ('Otra...', (SELECT id FROM art_categories WHERE name = 'Audiovisuales')),
+-- Danza
 ('Ballet', (SELECT id FROM art_categories WHERE name = 'Danza')),
 ('Contemporánea', (SELECT id FROM art_categories WHERE name = 'Danza')),
 ('Moderna', (SELECT id FROM art_categories WHERE name = 'Danza')),
 ('Urbana', (SELECT id FROM art_categories WHERE name = 'Danza')),
 ('Tradicional', (SELECT id FROM art_categories WHERE name = 'Danza')),
 ('Otra...', (SELECT id FROM art_categories WHERE name = 'Danza')),
+-- Literatura
 ('Crónica', (SELECT id FROM art_categories WHERE name = 'Literatura')),
 ('Cuento', (SELECT id FROM art_categories WHERE name = 'Literatura')),
 ('Ensayo', (SELECT id FROM art_categories WHERE name = 'Literatura')),
 ('Novela', (SELECT id FROM art_categories WHERE name = 'Literatura')),
 ('Poesía', (SELECT id FROM art_categories WHERE name = 'Literatura')),
 ('Otra...', (SELECT id FROM art_categories WHERE name = 'Literatura')),
+-- Música
 ('Clásica o académica', (SELECT id FROM art_categories WHERE name = 'Música')),
 ('Experimental', (SELECT id FROM art_categories WHERE name = 'Música')),
 ('Fusión', (SELECT id FROM art_categories WHERE name = 'Música')),
@@ -94,6 +114,7 @@ INSERT INTO art_disciplines (name, art_category_id) VALUES
 ('Tradicional', (SELECT id FROM art_categories WHERE name = 'Música')),
 ('Urbana', (SELECT id FROM art_categories WHERE name = 'Música')),
 ('Otra...', (SELECT id FROM art_categories WHERE name = 'Música')),
+-- Teatro
 ('Circo', (SELECT id FROM art_categories WHERE name = 'Teatro')),
 ('Clown', (SELECT id FROM art_categories WHERE name = 'Teatro')),
 ('Mimo', (SELECT id FROM art_categories WHERE name = 'Teatro')),
