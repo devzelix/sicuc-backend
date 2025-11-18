@@ -150,3 +150,38 @@
 
 - The primary execution method shifts from running a local JAR to **`docker compose -f docker-compose.prod.yml up -d`**.
 - The next step for production safety is the implementation of **Flyway** for secure database schema management (`DDL_AUTO=none`).
+
+## [6.0.0] - 2025-11-09
+
+### 🚀 Major Release: Architecture Hardening & Quality Assurance
+
+This release focuses on significantly improving the system's stability and maintainability. It introduces a full automated testing suite, standardized database schema management via Flyway, and comprehensive API documentation to ensure long-term code health.
+
+### ✨ Added
+
+- **🛡️ Comprehensive Automated Testing Suite (50+ Tests)**
+  - **Integration Tests:** Added `CultorControllerIntegrationTests` covering all CRUD operations (`GET`, `POST`, `PUT`, `DELETE`) with a full HTTP-to-Database flow using an H2 in-memory database.
+  - **Unit Tests:** Implemented isolated unit tests using **Mockito** for core services (`CultorService`, `AuthenticationService`, `JwtService`), utilities (`DateValidator`), and JPA Specifications (`CultorSpecification`).
+  - **Test Infrastructure:** Configured a dedicated `src/test/resources/application.properties` for isolated test environments.
+
+- **🗄️ Professional Database Migration (Flyway)**
+  - Integrated **Flyway** for robust schema version control.
+  - Added migration scripts:
+    - `V1__Create_Complete_Schema.sql`: Defines the full database schema with foreign keys and constraints.
+    - `V2__Insert_Reference_Data.sql`: Populates lookup tables (Municipalities, Parishes, Art Categories) using ID-agnostic subqueries.
+  - **Important:** `spring.jpa.hibernate.ddl-auto` is now set to `validate` in production to prevent accidental schema changes.
+
+- **📚 Complete Code Documentation**
+  - Added professional, standard **Javadoc** to 100% of the codebase (Controllers, Services, Entities, DTOs, Config).
+  - Documented all configuration files (`docker-compose`, `.env`, `pom.xml`) to facilitate onboarding for new developers.
+
+### 🔧 Changed
+
+- **Refactored `CultorService`** to return `201 Created` (instead of `200 OK`) for successful POST requests, adhering to REST standards.
+- **Enhanced `GlobalExceptionHandler`** to provide detailed validation errors (concatenating multiple field errors) and handle security exceptions (`401`, `403`) consistently.
+- **Fixed Logic Bugs:** Corrected edge-case logic in `DateValidator` (birthday boundary) and JPA joins in `CultorSpecification` discovered during the testing phase.
+
+### 🚨 Breaking Changes
+
+- **Database Schema Control:** The application no longer auto-generates tables in production. You must use the provided Flyway migration scripts.
+- **Strict Validation:** The API now enforces stricter validation rules for `Date` fields and relationships (e.g., Parish must belong to Municipality), returning `400 Bad Request` for violations that might have previously passed.
